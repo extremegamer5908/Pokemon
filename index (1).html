@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon Counting Academy</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #E63946;
+  --red-dark: #b02030;
+  --yellow: #FFD166;
+  --yellow-dark: #e6a800;
+  --blue: #4361EE;
+  --blue-light: #738dff;
+  --green: #2DC653;
+  --purple: #7B2D8B;
+  --bg: #F5F7FF;
+  --card: #FFFFFF;
+  --text: #1a1a2e;
+  --muted: #6b7280;
+  --border: #E8ECF8;
+  --shadow: 0 4px 24px rgba(67,97,238,0.10);
+  --shadow-lg: 0 12px 40px rgba(67,97,238,0.18);
+  --r: 18px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+
+/* ─── INTRO ─── */
+#intro {
+  position:fixed; inset:0; z-index:9999;
+  background: radial-gradient(ellipse at 60% 40%, #1a2a6c, #b21f1f, #fdbb2d);
+  background-size:300% 300%;
+  animation: bgshift 6s ease infinite;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+  transition: opacity 0.6s, transform 0.6s;
+}
+@keyframes bgshift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+#intro.gone { opacity:0; transform:scale(1.06); pointer-events:none; }
+
+.intro-sprites {
+  display:flex; gap:20px; align-items:flex-end; margin-bottom:8px;
+}
+
+.intro-sprite { image-rendering:pixelated; filter:drop-shadow(0 8px 16px rgba(0,0,0,0.4)); }
+.bounce1 { animation:bounce 1.4s ease-in-out infinite; }
+.bounce2 { animation:bounce 1.4s ease-in-out 0.2s infinite; }
+.bounce3 { animation:bounce 1.4s ease-in-out 0.4s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-18px)} }
+
+.intro-title {
+  font-size:clamp(26px,6vw,52px); font-weight:900; color:white; text-align:center; line-height:1.15;
+  text-shadow:0 4px 20px rgba(0,0,0,0.4);
+}
+.intro-title em { color:var(--yellow); font-style:normal; }
+.intro-sub { font-size:15px; color:rgba(255,255,255,0.8); text-align:center; max-width:360px; line-height:1.7; }
+
+.pokeball-btn {
+  margin-top:10px; display:flex; align-items:center; gap:12px;
+  background:white; color:var(--red); border:none; border-radius:100px;
+  font-family:'Nunito',sans-serif; font-weight:900; font-size:17px;
+  padding:14px 36px; cursor:pointer;
+  box-shadow:0 6px 0 rgba(0,0,0,0.2), 0 10px 30px rgba(0,0,0,0.3);
+  transition:transform 0.15s, box-shadow 0.15s;
+}
+.pokeball-btn:hover { transform:translateY(-3px); box-shadow:0 9px 0 rgba(0,0,0,0.2),0 14px 34px rgba(0,0,0,0.3); }
+.pokeball-btn:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,0.2); }
+
+/* ─── HEADER ─── */
+header { background:white; border-bottom:2px solid var(--border); position:sticky; top:0; z-index:200; box-shadow:0 2px 16px rgba(67,97,238,0.08); }
+.hdr { max-width:1040px; margin:0 auto; padding:0 20px; height:62px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.logo { display:flex; align-items:center; gap:10px; font-size:17px; font-weight:900; }
+.logo img { width:36px; height:36px; image-rendering:pixelated; }
+.badge-counter { background:linear-gradient(135deg,var(--red),#ff6b6b); color:white; font-size:13px; font-weight:800; padding:7px 16px; border-radius:100px; box-shadow:0 3px 10px rgba(230,57,70,0.35); }
+
+/* ─── NAV ─── */
+nav { background:white; border-bottom:2px solid var(--border); }
+.nav-row { max-width:1040px; margin:0 auto; padding:0 20px; display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+nav::-webkit-scrollbar { display:none; }
+nav button { background:none; border:none; font-family:'Nunito',sans-serif; font-size:14px; font-weight:700; color:var(--muted); padding:13px 18px; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+nav button:hover { color:var(--blue); }
+nav button.active { color:var(--blue); border-bottom-color:var(--blue); }
+
+/* ─── LAYOUT ─── */
+main { max-width:1040px; margin:0 auto; padding:28px 20px 80px; }
+.page { display:none; } .page.active { display:block; }
+
+/* ─── HERO ─── */
+.hero-band {
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 60%,#0f3460 100%);
+  border-radius:24px; padding:36px 40px;
+  display:flex; align-items:center; gap:32px;
+  margin-bottom:28px; overflow:hidden; position:relative;
+}
+.hero-band::before { content:''; position:absolute; right:-60px; top:-60px; width:240px; height:240px; border-radius:50%; background:rgba(255,255,255,0.04); }
+.hero-copy { flex:1; position:relative; z-index:1; }
+.hero-copy h1 { font-size:clamp(20px,4vw,32px); font-weight:900; color:white; line-height:1.2; margin-bottom:10px; }
+.hero-copy h1 span { color:var(--yellow); }
+.hero-copy p { font-size:14px; color:rgba(255,255,255,0.75); line-height:1.8; margin-bottom:20px; }
+.hero-sprites { display:flex; gap:8px; align-items:flex-end; flex-shrink:0; position:relative; z-index:1; }
+.hero-sprites img { image-rendering:pixelated; filter:drop-shadow(0 6px 12px rgba(0,0,0,0.5)); }
+
+/* ─── PROGRESS ─── */
+.prog-card { background:white; border-radius:var(--r); padding:22px 24px; margin-bottom:28px; box-shadow:var(--shadow); }
+.prog-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.prog-label { font-weight:900; font-size:15px; }
+.prog-pct { font-size:13px; color:var(--muted); font-weight:700; }
+.prog-bar-bg { height:12px; background:#eef0fb; border-radius:100px; overflow:hidden; margin-bottom:16px; }
+.prog-bar-fill { height:100%; background:linear-gradient(90deg,var(--green),#7aeba7); border-radius:100px; width:0%; transition:width 1s cubic-bezier(.4,0,.2,1); }
+.badge-icons { display:flex; gap:10px; flex-wrap:wrap; }
+.b-icon { width:44px; height:44px; border-radius:50%; background:#f0f2ff; border:2px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:20px; transition:all 0.3s; }
+.b-icon.earned { background:var(--yellow); border-color:var(--yellow-dark); box-shadow:0 4px 14px rgba(255,209,102,0.5); transform:scale(1.1); }
+
+/* ─── SECTION TITLE ─── */
+.sec-title { font-size:19px; font-weight:900; margin-bottom:18px; display:flex; align-items:center; gap:8px; }
+
+/* ─── ZONE CARDS ─── */
+.zones-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; }
+
+.zone-card { background:white; border-radius:var(--r); overflow:hidden; box-shadow:var(--shadow); cursor:pointer; transition:transform 0.2s,box-shadow 0.2s; border:2px solid transparent; }
+.zone-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-lg); border-color:var(--zc,var(--blue)); }
+
+.zc-top { padding:20px 20px 0; position:relative; min-height:140px; display:flex; flex-direction:column; justify-content:flex-end; }
+.zc-num { position:absolute; top:12px; right:14px; font-size:11px; font-weight:800; color:rgba(255,255,255,0.75); background:rgba(0,0,0,0.15); padding:3px 9px; border-radius:100px; }
+.zc-sprite-wrap { display:flex; justify-content:center; }
+.zc-sprite { width:96px; height:96px; image-rendering:pixelated; filter:drop-shadow(0 8px 16px rgba(0,0,0,0.35)); animation:bob 2.5s ease-in-out infinite; }
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+.zc-bottom { padding:16px 18px; }
+.zc-name { font-size:15px; font-weight:900; margin-bottom:4px; }
+.zc-concept { font-size:11px; font-weight:700; padding:3px 10px; border-radius:100px; display:inline-block; margin-bottom:10px; }
+.zc-desc { font-size:12px; color:var(--muted); line-height:1.6; }
+.zc-foot { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+.zc-diff { display:flex; gap:4px; }
+.zc-dot { width:8px; height:8px; border-radius:50%; background:#eef0fb; }
+.zc-dot.on { background:var(--zc,var(--blue)); }
+.zc-cta { font-size:12px; font-weight:800; }
+
+/* ─── STORY ─── */
+.story-intro { background:white; border-radius:var(--r); padding:28px; box-shadow:var(--shadow); margin-bottom:20px; line-height:1.9; font-size:14px; color:#444; }
+.chapter { background:white; border-radius:var(--r); padding:22px 24px; box-shadow:var(--shadow); margin-bottom:14px; display:flex; gap:16px; align-items:flex-start; border-left:4px solid var(--cc,var(--blue)); transition:transform 0.2s; }
+.chapter:hover { transform:translateX(4px); }
+.ch-sprite { image-rendering:pixelated; flex-shrink:0; }
+.ch-num { font-size:10px; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:3px; }
+.ch-title { font-size:15px; font-weight:900; margin-bottom:6px; }
+.ch-text { font-size:13px; color:#555; line-height:1.8; }
+
+/* ─── MODAL ─── */
+.overlay { position:fixed; inset:0; background:rgba(10,10,30,0.65); backdrop-filter:blur(6px); z-index:800; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+.overlay.open { opacity:1; pointer-events:all; }
+.modal { background:white; border-radius:26px; max-width:560px; width:100%; max-height:88vh; overflow-y:auto; box-shadow:0 24px 80px rgba(0,0,0,0.35); transform:translateY(30px) scale(0.96); transition:transform 0.25s; }
+.overlay.open .modal { transform:translateY(0) scale(1); }
+
+.m-head { border-radius:26px 26px 0 0; padding:28px 28px 20px; position:relative; text-align:center; }
+.m-close { position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.25); border:none; border-radius:50%; width:34px; height:34px; font-size:16px; cursor:pointer; color:white; display:flex; align-items:center; justify-content:center; transition:background 0.2s; }
+.m-close:hover { background:rgba(255,255,255,0.4); }
+.m-sprite { image-rendering:pixelated; filter:drop-shadow(0 8px 20px rgba(0,0,0,0.35)); animation:bob 2s ease-in-out infinite; }
+.m-zone { font-size:13px; color:rgba(255,255,255,0.75); font-weight:700; margin-bottom:4px; }
+.m-name { font-size:22px; font-weight:900; color:white; margin-bottom:10px; }
+.m-tag { display:inline-block; background:rgba(255,255,255,0.25); color:white; font-size:12px; font-weight:800; padding:4px 14px; border-radius:100px; }
+
+.m-body { padding:24px; }
+.m-sec-label { font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:8px; margin-top:16px; }
+.story-block { background:#f8f9ff; border-radius:12px; padding:14px 18px; font-size:13px; line-height:1.8; border-left:3px solid; }
+.q-block { background:#fff8e7; border:2px dashed #ffd166; border-radius:12px; padding:14px 18px; font-size:14px; font-weight:700; line-height:1.7; }
+.hint-block { background:#f0f9ff; border-radius:12px; padding:14px 18px; font-size:13px; color:#0369a1; line-height:1.7; display:flex; gap:10px; }
+.ans-block { background:#eefbf4; border:2px solid #bbf7d0; border-radius:12px; padding:20px; text-align:center; font-size:13px; color:var(--muted); font-weight:700; }
+
+/* ─── CONCEPTS ─── */
+.concepts-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; }
+.cc { background:white; border-radius:14px; padding:16px 18px; box-shadow:var(--shadow); border-left:4px solid var(--cc,#ccc); display:flex; align-items:flex-start; gap:14px; }
+.cc.off { opacity:0.4; filter:grayscale(1); }
+.cc-sprite { image-rendering:pixelated; flex-shrink:0; }
+.cc-name { font-size:13px; font-weight:800; margin-bottom:4px; line-height:1.4; }
+.cc-zone { font-size:11px; color:var(--muted); font-weight:600; margin-bottom:6px; }
+.cc-badge { display:inline-block; font-size:10px; font-weight:800; padding:2px 9px; border-radius:100px; }
+.cc-badge.yes { background:#e8fdf0; color:var(--green); }
+.cc-badge.no { background:#f0f0f0; color:#aaa; }
+
+/* ─── TOOLS ─── */
+.tools-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:16px; }
+.tool { background:white; border-radius:var(--r); padding:22px; box-shadow:var(--shadow); }
+.tool-ttl { font-size:14px; font-weight:900; margin-bottom:16px; }
+.venn { position:relative; height:130px; display:flex; align-items:center; justify-content:center; }
+.vc { width:100px; height:100px; border-radius:50%; border:3px solid; position:absolute; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; text-align:center; padding:8px; }
+.vc.a { left:16px; border-color:var(--blue); background:rgba(67,97,238,0.1); color:var(--blue); }
+.vc.b { right:16px; border-color:var(--red); background:rgba(230,57,70,0.1); color:var(--red); }
+.vc.mid { background:none; border:none; color:var(--purple); font-size:10px; left:50%; transform:translateX(-50%); z-index:1; }
+.tree { font-family:monospace; font-size:13px; line-height:2.1; color:#555; }
+.tn { color:var(--text); font-weight:800; }
+.pascal { text-align:center; font-size:17px; font-weight:700; line-height:2.2; color:#bbb; }
+.pascal .hl { color:var(--red); font-weight:900; }
+.fl { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.fl li { display:flex; align-items:center; gap:12px; }
+.fk { font-weight:900; color:var(--blue); min-width:90px; font-size:14px; }
+.fv { color:var(--muted); font-weight:600; font-size:13px; }
+
+/* ─── BUTTONS ─── */
+.btn { font-family:'Nunito',sans-serif; font-weight:800; font-size:14px; padding:12px 26px; border-radius:100px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+.btn-red { background:var(--red); color:white; box-shadow:0 4px 0 var(--red-dark),0 6px 16px rgba(230,57,70,.3); }
+.btn-red:hover { transform:translateY(-2px); }
+.btn-red:active { transform:translateY(3px); box-shadow:0 1px 0 var(--red-dark); }
+.btn-ghost { background:rgba(255,255,255,0.15); color:white; border:2px solid rgba(255,255,255,0.4); }
+.btn-ghost:hover { background:rgba(255,255,255,0.25); }
+
+@media(max-width:600px){
+  main{padding:16px 14px 60px;}
+  .hero-band{flex-direction:column;padding:24px;text-align:center;}
+  .hero-sprites{justify-content:center;}
+  .chapter{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <div class="intro-sprites">
+    <img class="intro-sprite bounce1" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur">
+    <img class="intro-sprite bounce2" width="120" height="120" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" alt="Charizard">
+    <img class="intro-sprite bounce3" width="96" height="96" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="Squirtle">
+  </div>
+  <div class="intro-title">Pokémon<br><em>Counting Academy</em></div>
+  <div class="intro-sub">Professor Oak needs your help! Solve 8 counting puzzles across Kanto to earn your Counting Badges.</div>
+  <button class="pokeball-btn" onclick="startGame()">
+    <svg width="26" height="26" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="white" stroke="#ddd" stroke-width="1.5"/><path d="M1 14 Q1 1 14 1 Q27 1 27 14 Z" fill="#E63946"/><rect x="1" y="12" width="26" height="4" fill="#222"/><circle cx="14" cy="14" r="4.5" fill="white" stroke="#222" stroke-width="2"/></svg>
+    Start Your Journey!
+  </button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr">
+    <div class="logo">
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Pikachu">
+      Counting Academy
+    </div>
+    <div class="badge-counter" id="badge-counter">🏅 0 / 8 Badges</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-row">
+    <button class="active" onclick="showPage('home',this)">🏠 Home</button>
+    <button onclick="showPage('story',this)">📖 Story</button>
+    <button onclick="showPage('zones',this)">🗺️ Zones</button>
+    <button onclick="showPage('concepts',this)">📚 Concepts</button>
+    <button onclick="showPage('tools',this)">🔧 Tools</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="hero-band">
+      <div class="hero-copy">
+        <h1>Welcome, Trainer! <span>⚡</span></h1>
+        <p>Professor Oak has set 8 counting challenges across Kanto. Solve each one to earn a <strong style="color:var(--yellow)">Counting Badge</strong> and become a true Pokémon Math Master!</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-red" onclick="showPage('zones',document.querySelector('nav button:nth-child(3)'))">View All Zones →</button>
+          <button class="btn btn-ghost" onclick="showPage('story',document.querySelector('nav button:nth-child(2)'))">Read the Story</button>
+        </div>
+      </div>
+      <div class="hero-sprites">
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png" width="80" height="80" alt="Lapras" style="animation:bob 2s ease-in-out infinite;image-rendering:pixelated;filter:drop-shadow(0 6px 12px rgba(0,0,0,0.5));">
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png" width="100" height="100" alt="Snorlax" style="animation:bob 2.3s ease-in-out .2s infinite;image-rendering:pixelated;filter:drop-shadow(0 6px 12px rgba(0,0,0,0.5));">
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png" width="90" height="90" alt="Dragonite" style="animation:bob 2s ease-in-out .4s infinite;image-rendering:pixelated;filter:drop-shadow(0 6px 12px rgba(0,0,0,0.5));">
+      </div>
+    </div>
+    <div class="prog-card">
+      <div class="prog-top">
+        <div class="prog-label">🏅 Badge Progress</div>
+        <div class="prog-pct" id="prog-text">0 of 8 completed</div>
+      </div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="prog-fill"></div></div>
+      <div class="badge-icons" id="badge-icons"></div>
+    </div>
+    <div class="sec-title">🗺️ Featured Zones</div>
+    <div class="zones-grid" id="home-zones"></div>
+  </div>
+
+  <!-- STORY -->
+  <div class="page" id="page-story">
+    <div class="sec-title">📖 The Story</div>
+    <div class="story-intro">
+      In the peaceful town of <strong>Pallet Town</strong>, a young trainer named <strong>Alex</strong> is finally old enough to start a Pokémon journey. But Professor Oak has one condition first...
+      <br><br>
+      <em>"The Pokémon world is full of choices,"</em> Oak explains, his Dragonite curling at his feet. <em>"How many ways can a trainer build a team? How many battle strategies exist? To receive your starter Pokémon, you must prove you understand the mathematics of counting!"</em>
+      <br><br>
+      And so Alex sets off across <strong>8 iconic Kanto locations</strong> — each hiding a counting puzzle that must be solved to move forward. Solve them all, earn 8 Counting Badges, and Professor Oak will crown you a <strong>Pokémon Math Master!</strong> 🏆
+    </div>
+    <div class="sec-title">📍 Chapters</div>
+    <div id="chapters-list"></div>
+  </div>
+
+  <!-- ZONES -->
+  <div class="page" id="page-zones">
+    <div class="sec-title">🗺️ All 8 Challenge Zones</div>
+    <p style="color:var(--muted);font-size:14px;font-weight:600;margin-bottom:20px;">Tap any zone to read its story, question and hint!</p>
+    <div class="zones-grid" id="all-zones"></div>
+  </div>
+
+  <!-- CONCEPTS -->
+  <div class="page" id="page-concepts">
+    <div class="sec-title">📚 Counting Concepts</div>
+    <p style="color:var(--muted);font-size:14px;font-weight:600;margin-bottom:20px;">12 concepts total — at least 8 must appear. ✓ = used in story!</p>
+    <div class="concepts-grid" id="concepts-grid"></div>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="page" id="page-tools">
+    <div class="sec-title">🔧 Math Organizers</div>
+    <p style="color:var(--muted);font-size:14px;font-weight:600;margin-bottom:20px;">Key diagrams and tools used throughout the story.</p>
+    <div class="tools-grid">
+      <div class="tool">
+        <div class="tool-ttl">⭕ Venn Diagram — Zone 4</div>
+        <div class="venn">
+          <div class="vc a">Lick<br><strong>18</strong></div>
+          <div class="vc b">Shadow Ball<br><strong>20</strong></div>
+          <div class="vc mid">Both<br><strong style="font-size:15px">8</strong></div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:8px;">|A∪B| = 18 + 20 − 8 = <strong>30</strong></p>
+      </div>
+      <div class="tool">
+        <div class="tool-ttl">🌳 Tree Diagram — Zone 7</div>
+        <div class="tree">
+          <div class="tn">Seafoam Fork</div>
+          <div>├── ❄️ Left Path 1 → 2 tunnels</div>
+          <div>├── ❄️ Left Path 2 → 2 tunnels</div>
+          <div>├── 🌊 Right Path 1 → 3 tunnels</div>
+          <div>├── 🌊 Right Path 2 → 3 tunnels</div>
+          <div>└── 🌊 Right Path 3 → 3 tunnels</div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px;">(2×2) + (3×3) = 4 + 9 = <strong>13 total paths</strong></p>
+      </div>
+      <div class="tool">
+        <div class="tool-ttl">🔺 Pascal's Triangle — Zone 5</div>
+        <div class="pascal">
+          <div>1</div><div>1 &nbsp; 1</div><div>1 &nbsp; 2 &nbsp; 1</div>
+          <div>1 &nbsp; 3 &nbsp; 3 &nbsp; 1</div><div>1 &nbsp; 4 &nbsp; 6 &nbsp; 4 &nbsp; 1</div>
+          <div class="hl">1 &nbsp; 5 &nbsp; 10 &nbsp; 10 &nbsp; 5 &nbsp; 1</div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:10px;">5+10+10+5+1 = <strong>31 non-empty subsets</strong></p>
+      </div>
+      <div class="tool">
+        <div class="tool-ttl">📐 Formula Reference</div>
+        <ul class="fl">
+          <li><span class="fk">n!</span><span class="fv">n × (n−1) × ... × 1</span></li>
+          <li><span class="fk">P(n,r)</span><span class="fv">n! ÷ (n−r)!</span></li>
+          <li><span class="fk">C(n,r)</span><span class="fv">n! ÷ [r!(n−r)!]</span></li>
+          <li><span class="fk">FCP</span><span class="fv">n₁ × n₂ × ... × nₖ</span></li>
+          <li><span class="fk">Indirect</span><span class="fv">Total − Excluded</span></li>
+          <li><span class="fk">Additive</span><span class="fv">|A| + |B| (no overlap)</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="handleBg(event)">
+  <div class="modal">
+    <div class="m-head" id="m-head">
+      <button class="m-close" onclick="closeModal()">✕</button>
+      <img class="m-sprite" id="m-sprite" width="120" height="120" alt="">
+      <div class="m-zone" id="m-zone"></div>
+      <div class="m-name" id="m-name"></div>
+      <span class="m-tag" id="m-tag"></span>
+    </div>
+    <div class="m-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const S = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+
+const ZONES = [
+  { id:1, name:"Viridian Forest", sp:10, sp2:11, concept:"Fundamental Counting Principle", tag:"FCP",
+    c:"#2DC653", c2:"#7aeba7", cbg:"#e8fdf0", diff:1, badge:"🌲",
+    story:"Alex enters Viridian Forest. There are 4 different trails to enter, 3 bridges to cross the river, and 2 exits leading to Pewter City.",
+    q:"How many different ways can Alex travel through Viridian Forest from entrance to exit?",
+    hint:"FCP: multiply the number of choices at each step. 4 × 3 × 2 = ?",
+    ch:"Alex steps nervously into Viridian Forest. Four separate trails branch into the thick green shadows. Caterpie and Weedle peek from the leaves — which path leads through fastest?" },
+  { id:2, name:"Mt. Moon", sp:35, sp2:39, concept:"Permutations", tag:"P(n,r)",
+    c:"#9B59B6", c2:"#c888e0", cbg:"#f5eeff", diff:2, badge:"🏔️",
+    story:"Team Rocket stole 3 Moon Stones — Red, Blue, and Yellow — and placed them on 3 pedestals. Only the correct arrangement unlocks the exit door.",
+    q:"How many different arrangements of the 3 Moon Stones across 3 pedestals are possible?",
+    hint:"Order matters → use n! = 3! = 3 × 2 × 1 = ?",
+    ch:"Deep inside Mt. Moon, Alex finds a locked door with three glowing pedestals. Team Rocket's graffiti reads: 'The wrong order means the wrong outcome!' Three Moon Stones glint on a ledge..." },
+  { id:3, name:"SS Anne", sp:131, sp2:54, concept:"Combinations — C(n,r)", tag:"C(n,r)",
+    c:"#4361EE", c2:"#738dff", cbg:"#eef0ff", diff:2, badge:"🚢",
+    story:"10 trainers compete on the SS Anne. The Captain must choose exactly 3 for a special relay battle. The order of selection doesn't matter.",
+    q:"How many ways can the Captain choose a group of 3 trainers from 10?",
+    hint:"C(10,3) = 10! ÷ [3! × 7!] = ?",
+    ch:"The SS Anne is docked at Vermilion City, decks buzzing with trainers. Lapras splash alongside the hull. The Captain blows her whistle: 'I need 3 volunteers for a relay battle!'" },
+  { id:4, name:"Lavender Town", sp:92, sp2:93, concept:"Venn Diagrams", tag:"VENN",
+    c:"#607D8B", c2:"#90a4ae", cbg:"#eceff1", diff:2, badge:"👻",
+    story:"In Pokémon Tower, 30 ghost Pokémon are spotted. 18 know Lick, 20 know Shadow Ball, and 8 know both moves.",
+    q:"How many ghost Pokémon know at least one move? How many know neither?",
+    hint:"Use |A∪B| = |A| + |B| − |A∩B|. Draw a Venn Diagram to see the overlap!",
+    ch:"A purple fog rolls over Lavender Town. Alex enters Pokémon Tower where Gastly and Haunter drift between floors. A researcher's notebook falls open listing every move each ghost knows..." },
+  { id:5, name:"Celadon Game Corner", sp:133, sp2:137, concept:"Pascal's Triangle", tag:"PASCAL",
+    c:"#FF8C00", c2:"#ffb347", cbg:"#fff4e6", diff:3, badge:"🎰",
+    story:"The Game Corner prize machine holds 5 Pokémon prizes. Alex can win any number of them — from 1 to all 5. How many different prize combinations are there?",
+    q:"Using Pascal's Triangle, find the total number of non-empty subsets of the 5 prizes.",
+    hint:"Row 5 of Pascal's Triangle: 1, 5, 10, 10, 5, 1. Sum all except first term (empty set): 5+10+10+5+1 = ?",
+    ch:"Neon lights fill the Celadon Game Corner. Five glittering prizes sit behind the counter — an Eevee, Porygon, Dratini, Scyther, and Clefairy. Alex wants to know every possible combination to aim for!" },
+  { id:6, name:"Power Plant", sp:25, sp2:26, concept:"Permutations with Identical Elements", tag:"P-ID",
+    c:"#E6B800", c2:"#ffd740", cbg:"#fffde7", diff:3, badge:"⚡",
+    story:"The Power Plant security panel needs the letters of PIKACHU arranged as a password. Because some letters repeat, not every arrangement looks different.",
+    q:"How many distinct arrangements of the letters in PIKACHU are possible?",
+    hint:"Count repeated letters in PIKACHU first, then use n! ÷ (repeated letter factorials).",
+    ch:"Lights flicker across all of Kanto — something's wrong at the Power Plant! Alex finds the terminal locked. A sticky note reads: 'Password = unique arrangement of PIKACHU.' Pikachu sparks nearby..." },
+  { id:7, name:"Seafoam Islands", sp:144, sp2:86, concept:"Tree Diagrams & Additive Counting", tag:"TREE + ADD",
+    c:"#00B4D8", c2:"#48cae4", cbg:"#e0f7fa", diff:2, badge:"🧊",
+    story:"Seafoam Islands has branching ice corridors. At the first fork: 2 left paths and 3 right paths. Each left path leads to 2 more tunnels; each right path leads to 3 more.",
+    q:"Draw a tree diagram showing all possible routes. How many total paths lead through the islands?",
+    hint:"Left side: 2×2 = 4. Right side: 3×3 = 9. Additive Counting: 4 + 9 = ?",
+    ch:"Articuno is said to nest deep inside the Seafoam Islands. The icy caves branch constantly — every step forward splits into two more. Alex sketches a map, breath fogging in the cold air..." },
+  { id:8, name:"Indigo Plateau", sp:149, sp2:6, concept:"Indirect Method & Factorials", tag:"INDIRECT",
+    c:"#E63946", c2:"#ff6b6b", cbg:"#fef2f2", diff:4, badge:"🏆",
+    story:"Alex must choose a team of 6 Pokémon from a roster of 10 for the Elite Four. At least 1 must be a Water-type, and 4 Water-types are available.",
+    q:"How many valid 6-Pokémon teams include at least one Water-type?",
+    hint:"Indirect: C(10,6) − C(6,6) = all teams minus teams with zero Water-types.",
+    ch:"The Indigo Plateau rises from the mountains in golden morning light. Alex stares at a roster of 10 battle-ready Pokémon. Only 6 can enter. The math will decide everything." }
+];
+
+const CONCEPTS = [
+  { name:"Fundamental Counting Principle", sp:19, zone:1, used:true, c:"#2DC653" },
+  { name:"Additive Counting Principle", sp:54, zone:7, used:true, c:"#00B4D8" },
+  { name:"Factorials", sp:143, zone:8, used:true, c:"#E63946" },
+  { name:"Permutations", sp:52, zone:2, used:true, c:"#9B59B6" },
+  { name:"Permutations with Identical Elements", sp:25, zone:6, used:true, c:"#E6B800" },
+  { name:"Advanced Subsets / Poker Problems", sp:null, zone:null, used:false, c:"#ccc" },
+  { name:"Tree Diagrams", sp:144, zone:7, used:true, c:"#00B4D8" },
+  { name:"Combinations — C(n,r)", sp:4, zone:3, used:true, c:"#4361EE" },
+  { name:"Pascal's Triangle", sp:133, zone:5, used:true, c:"#FF8C00" },
+  { name:"Combinations — Choose Some Items", sp:137, zone:5, used:true, c:"#FF8C00" },
+  { name:"Venn Diagrams", sp:92, zone:4, used:true, c:"#607D8B" },
+  { name:"Indirect Method", sp:149, zone:8, used:true, c:"#E63946" },
+];
+
+function makeZoneCards(data) {
+  return data.map(z => `
+    <div class="zone-card" style="--zc:${z.c};" onclick="openModal(${z.id-1})">
+      <div class="zc-top" style="background:linear-gradient(160deg,${z.c},${z.c2});">
+        <div class="zc-num">Zone ${z.id}</div>
+        <div class="zc-sprite-wrap">
+          <img class="zc-sprite" src="${S(z.sp)}" alt="${z.name}" loading="lazy">
+        </div>
+      </div>
+      <div class="zc-bottom">
+        <div class="zc-name">${z.name}</div>
+        <div class="zc-concept" style="color:${z.c};background:${z.cbg};">${z.concept}</div>
+        <div class="zc-desc">${z.story.split('.')[0]}.</div>
+        <div class="zc-foot">
+          <div class="zc-diff">${[1,2,3,4].map(i=>`<div class="zc-dot${i<=z.diff?' on':''}"></div>`).join('')}</div>
+          <div class="zc-cta" style="color:${z.c};">Tap to open →</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(idx) {
+  const z = ZONES[idx];
+  const head = document.getElementById('m-head');
+  head.style.background = `linear-gradient(160deg, ${z.c}, ${z.c2})`;
+  document.getElementById('m-sprite').src = S(z.sp2||z.sp);
+  document.getElementById('m-zone').textContent = `Zone ${z.id}`;
+  document.getElementById('m-name').textContent = z.name;
+  document.getElementById('m-tag').textContent = z.concept;
+  document.getElementById('m-body').innerHTML = `
+    <div class="m-sec-label">📍 Setting</div>
+    <div class="story-block" style="border-color:${z.c};">${z.story}</div>
+    <div class="m-sec-label">❓ Question — ${z.tag}</div>
+    <div class="q-block">${z.q}</div>
+    <div class="m-sec-label">💡 Hint</div>
+    <div class="hint-block"><span style="font-size:20px;">💡</span><span>${z.hint}</span></div>
+    <div class="m-sec-label">✏️ Answer</div>
+    <div class="ans-block">
+      <img src="${S(z.sp)}" width="64" height="64" style="image-rendering:pixelated;opacity:0.4;margin-bottom:8px;"><br>
+      Answer space — coming soon!<br>
+      <span style="font-size:12px;">Your worked solution will go here.</span>
+    </div>
+  `;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('overlay').classList.remove('open'); }
+function handleBg(e) { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function startGame() { document.getElementById('intro').classList.add('gone'); }
+
+// INIT
+document.getElementById('home-zones').innerHTML = makeZoneCards(ZONES.slice(0,4)) + `
+  <div onclick="showPage('zones',document.querySelector('nav button:nth-child(3)'))" style="background:white;border-radius:var(--r);box-shadow:var(--shadow);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:200px;color:var(--muted);font-weight:700;font-size:14px;border:2px dashed var(--border);transition:all 0.2s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+    <span style="font-size:36px;">🗺️</span>See all 8 Zones →
+  </div>`;
+
+document.getElementById('all-zones').innerHTML = makeZoneCards(ZONES);
+
+document.getElementById('chapters-list').innerHTML = ZONES.map(z => `
+  <div class="chapter" style="--cc:${z.c};">
+    <img class="ch-sprite" src="${S(z.sp)}" width="72" height="72" alt="${z.name}" loading="lazy">
+    <div>
+      <div class="ch-num">Chapter ${z.id}</div>
+      <div class="ch-title" style="color:${z.c};">${z.name}</div>
+      <div class="ch-text">${z.ch}</div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('concepts-grid').innerHTML = CONCEPTS.map(c => `
+  <div class="cc ${c.used?'':'off'}" style="--cc:${c.c};">
+    ${c.sp ? `<img class="cc-sprite" src="${S(c.sp)}" width="48" height="48" alt="" loading="lazy">` : '<div style="width:48px;height:48px;"></div>'}
+    <div>
+      <div class="cc-name">${c.name}</div>
+      <div class="cc-zone">${c.used ? `Zone ${c.zone} — ${ZONES[c.zone-1]?.name}` : 'Not used'}</div>
+      <span class="cc-badge ${c.used?'yes':'no'}">${c.used?'✓ In Story':'— Not Used'}</span>
+    </div>
+  </div>`).join('');
+
+document.getElementById('badge-icons').innerHTML = ZONES.map((z,i) =>
+  `<div class="b-icon" id="bi-${i}" title="${z.name}">${z.badge}</div>`).join('');
+</script>
+</body>
+</html>
