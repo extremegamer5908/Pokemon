@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Ash's Journey Through Kanto</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --red:#e3350d;--darkred:#9b0000;--yellow:#ffde00;
+    --blue:#3b4cca;--lightblue:#6890f0;--white:#f8f8f8;
+    --dark:#1a1a2e;--darker:#0f0f1a;--gray:#888;
+    --green:#4caf50;--border:rgba(255,255,255,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--darker);color:var(--white);font-family:'VT323',monospace;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(59,76,202,.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(227,53,13,.1) 0%,transparent 40%);pointer-events:none;z-index:0;}
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .star{position:absolute;background:white;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate;opacity:.6;}
+  @keyframes twinkle{from{opacity:.2}to{opacity:.9}}
+
+  /* ── SPRITES ── */
+  img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));}
+  .bounce{animation:sBounce .9s ease-in-out infinite;}
+  .float{animation:sFloat 2.5s ease-in-out infinite;}
+  .spin-in{animation:sSpinIn .6s cubic-bezier(.175,.885,.32,1.275) forwards;}
+  .shake-spr{animation:sShake .5s ease!important;}
+  @keyframes sBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes sFloat{0%,100%{transform:translateY(0)rotate(-2deg)}50%{transform:translateY(-14px)rotate(2deg)}}
+  @keyframes sSpinIn{0%{transform:scale(0)rotate(-180deg);opacity:0}100%{transform:scale(1)rotate(0);opacity:1}}
+  @keyframes sShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)rotate(-8deg)}40%{transform:translateX(12px)rotate(8deg)}60%{transform:translateX(-8px)rotate(-4deg)}80%{transform:translateX(8px)rotate(4deg)}}
+
+  /* ── TITLE ── */
+  #title-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:var(--darker);gap:22px;transition:opacity .8s ease;}
+  #title-screen.hidden{opacity:0;pointer-events:none;}
+  .title-logo{text-align:center;animation:floatLogo 3s ease-in-out infinite;}
+  @keyframes floatLogo{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  .title-logo h1{font-family:'Press Start 2P',monospace;font-size:clamp(13px,2.8vw,21px);color:var(--yellow);text-shadow:3px 3px 0 var(--darkred),6px 6px 0 rgba(0,0,0,.5);line-height:1.7;letter-spacing:2px;}
+  .title-logo h2{font-family:'Press Start 2P',monospace;font-size:clamp(7px,1.3vw,10px);color:var(--lightblue);margin-top:10px;text-shadow:2px 2px 0 var(--blue);}
+  .title-starters{display:flex;gap:12px;align-items:flex-end;padding:10px 24px;background:rgba(0,0,0,.35);border:2px solid var(--border);border-radius:4px;}
+  .title-starters img{width:80px;height:80px;}
+  .title-starters img:nth-child(1){animation:sBounce .9s 0s ease-in-out infinite;}
+  .title-starters img:nth-child(2){animation:sBounce .9s .3s ease-in-out infinite;}
+  .title-starters img:nth-child(3){animation:sBounce .9s .6s ease-in-out infinite;}
+  .pokeball-spin{width:60px;height:60px;animation:spinBall 4s linear infinite;filter:drop-shadow(0 0 20px rgba(227,53,13,.6));}
+  @keyframes spinBall{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .start-btn{font-family:'Press Start 2P',monospace;font-size:14px;padding:16px 32px;background:var(--red);color:var(--yellow);border:4px solid var(--yellow);cursor:pointer;letter-spacing:2px;text-shadow:2px 2px 0 var(--darkred);box-shadow:4px 4px 0 var(--darkred),0 0 30px rgba(227,53,13,.4);transition:transform .1s,box-shadow .1s;animation:pulse 1.5s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:4px 4px 0 var(--darkred),0 0 20px rgba(227,53,13,.4)}50%{box-shadow:4px 4px 0 var(--darkred),0 0 40px rgba(227,53,13,.8)}}
+  .start-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--darkred),0 0 40px rgba(227,53,13,.7);}
+  .start-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--darkred);}
+
+  /* ── GAME ── */
+  #game-screen{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:20px 16px 60px;display:none;}
+  #game-screen.active{display:block;}
+  .top-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:rgba(0,0,0,.5);border:2px solid var(--border);border-radius:4px;margin-bottom:24px;gap:12px;}
+  .trainer-info{display:flex;align-items:center;gap:10px;}
+  .trainer-img{width:44px;height:44px;animation:sBounce 1s ease-in-out infinite;}
+  .trainer-name{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);}
+  .score-display{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lightblue);text-align:right;}
+  .prog-wrap{flex:1;height:12px;background:rgba(255,255,255,.1);border:2px solid var(--border);border-radius:2px;overflow:hidden;max-width:200px;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--yellow));transition:width .5s ease;box-shadow:0 0 8px var(--yellow);}
+  .loc-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(59,76,202,.2);border:2px solid var(--blue);padding:6px 14px;border-radius:2px;margin-bottom:16px;font-size:18px;color:var(--lightblue);letter-spacing:1px;}
+
+  /* ── QUESTION CARD ── */
+  .q-card{background:rgba(10,10,30,.88);border:3px solid var(--border);border-radius:4px;padding:28px 28px;margin-bottom:20px;position:relative;overflow:hidden;transition:border-color .3s;}
+  .q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--lightblue),var(--yellow));}
+  .card-inner{display:flex;gap:20px;align-items:flex-start;}
+  .card-text{flex:1;min-width:0;}
+  .card-spr-col{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:10px;flex-shrink:0;}
+  .card-spr-col img{width:96px;height:96px;}
+  .card-spr-col img.lg{width:112px;height:112px;}
+  .spr-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gray);text-align:center;letter-spacing:1px;}
+  .spr-row{display:flex;gap:2px;align-items:flex-end;}
+  .spr-row img{width:58px;height:58px;}
+  .spr-row img:nth-child(1){animation:sBounce .9s 0s ease-in-out infinite;}
+  .spr-row img:nth-child(2){animation:sBounce .9s .18s ease-in-out infinite;}
+  .spr-row img:nth-child(3){animation:sBounce .9s .36s ease-in-out infinite;}
+  .spr-row img:nth-child(4){animation:sBounce .9s .54s ease-in-out infinite;}
+  .spr-row img:nth-child(5){animation:sBounce .9s .72s ease-in-out infinite;}
+  .spr-row img:nth-child(6){animation:sBounce .9s .90s ease-in-out infinite;}
+  .spr-row img:nth-child(7){animation:sBounce .9s 1.08s ease-in-out infinite;}
+  .q-card.shake{animation:cardShake .5s ease;border-color:var(--red)!important;}
+  @keyframes cardShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-10px)}30%{transform:translateX(10px)}45%{transform:translateX(-8px)}60%{transform:translateX(8px)}75%{transform:translateX(-4px)}90%{transform:translateX(4px)}}
+  .q-card.c-flash{animation:cFlash .6s ease;border-color:var(--green)!important;}
+  @keyframes cFlash{0%{box-shadow:none}30%{box-shadow:0 0 40px var(--green),inset 0 0 20px rgba(76,175,80,.1)}100%{box-shadow:none}}
+  .q-num{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--gray);margin-bottom:12px;letter-spacing:2px;}
+  .q-type{display:inline-block;background:rgba(59,76,202,.3);border:1px solid var(--blue);padding:3px 10px;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lightblue);border-radius:2px;margin-bottom:14px;letter-spacing:1px;}
+  .q-text{font-size:22px;line-height:1.5;color:var(--white);margin-bottom:16px;}
+  .q-list{list-style:none;margin-bottom:16px;}
+  .q-list li{font-size:19px;color:rgba(255,255,255,.85);padding:3px 0 3px 20px;position:relative;}
+  .q-list li::before{content:'▶';position:absolute;left:0;color:var(--yellow);font-size:12px;top:6px;}
+  .multi-inputs{display:flex;flex-direction:column;gap:12px;}
+  .mi-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .mi-label{font-size:18px;color:var(--lightblue);}
+  .ans-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px;}
+  .ans-input{background:rgba(255,255,255,.07);border:2px solid var(--border);color:var(--white);font-family:'VT323',monospace;font-size:24px;padding:10px 16px;width:160px;border-radius:2px;outline:none;transition:border-color .2s;letter-spacing:1px;}
+  .ans-input:focus{border-color:var(--lightblue);box-shadow:0 0 12px rgba(104,144,240,.3);}
+  .sub-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:12px 20px;background:var(--blue);color:var(--white);border:3px solid var(--lightblue);cursor:pointer;letter-spacing:1px;box-shadow:3px 3px 0 rgba(0,0,0,.5);transition:transform .1s;}
+  .sub-btn:hover{transform:translate(-1px,-1px);background:var(--lightblue);}
+  .sub-btn:active{transform:translate(1px,1px);}
+  .sub-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+  /* ── RESULT ── */
+  .res-panel{margin-top:20px;padding:20px 24px;border-radius:4px;border:3px solid;display:none;position:relative;}
+  .res-panel.wrong{background:rgba(155,0,0,.2);border-color:var(--red);}
+  .res-panel.good{background:rgba(76,175,80,.1);border-color:var(--green);}
+  .res-panel.show{display:block;animation:slideIn .3s ease;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+  .res-inner{display:flex;gap:20px;align-items:flex-start;}
+  .res-spr{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .res-spr img{width:80px;height:80px;image-rendering:pixelated;}
+  .res-content{flex:1;}
+  .res-hdr{font-family:'Press Start 2P',monospace;font-size:11px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+  .res-hdr.bad{color:var(--red);}
+  .res-hdr.good-hdr{color:var(--green);}
+  .sol-block{font-size:19px;line-height:1.7;color:rgba(255,255,255,.9);}
+  .sol-step{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+  .sol-ans{margin-top:10px;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--yellow);text-shadow:1px 1px 0 var(--darkred);}
+  .choice-btns{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap;}
+  .cbtn{font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 16px;cursor:pointer;border:2px solid;letter-spacing:1px;transition:transform .1s;}
+  .cbtn:hover{transform:translate(-1px,-1px);}
+  .cbtn.yes{background:rgba(76,175,80,.2);color:var(--green);border-color:var(--green);}
+  .cbtn.no{background:rgba(255,255,255,.05);color:var(--gray);border-color:var(--gray);}
+  .next-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:14px 28px;background:var(--red);color:var(--yellow);border:3px solid var(--yellow);cursor:pointer;letter-spacing:2px;box-shadow:4px 4px 0 var(--darkred);transition:transform .1s,box-shadow .1s;margin-top:20px;display:none;}
+  .next-btn.show{display:inline-block;animation:slideIn .3s ease;}
+  .next-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--darkred);}
+  .next-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--darkred);}
+
+  /* ── OVERLAYS ── */
+  .w-overlay{position:fixed;inset:0;background:rgba(200,0,0,.15);pointer-events:none;z-index:999;opacity:0;}
+  .w-overlay.flash{animation:rFlash .6s ease;}
+  @keyframes rFlash{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+  .ptcl{position:fixed;pointer-events:none;z-index:998;font-size:20px;animation:flyUp var(--d2) ease forwards;}
+  @keyframes flyUp{0%{transform:translate(0,0)rotate(0);opacity:1}100%{transform:translate(var(--dx),-200px)rotate(720deg);opacity:0}}
+
+  /* ── WIN ── */
+  #win-screen{position:fixed;inset:0;background:var(--darker);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:20px;}
+  #win-screen.active{display:flex;animation:fadeIn 1s ease;}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .win-title{font-family:'Press Start 2P',monospace;font-size:clamp(13px,2.8vw,22px);color:var(--yellow);text-shadow:4px 4px 0 var(--darkred);animation:floatLogo 3s ease-in-out infinite;}
+  .win-score{font-family:'Press Start 2P',monospace;font-size:clamp(9px,1.8vw,14px);color:var(--lightblue);line-height:2.2;}
+  .win-sprs{display:flex;gap:10px;align-items:flex-end;}
+  .win-sprs img{width:80px;height:80px;image-rendering:pixelated;}
+  .win-sprs img:nth-child(1){animation:sBounce .9s 0s ease-in-out infinite;}
+  .win-sprs img:nth-child(2){animation:sBounce .9s .15s ease-in-out infinite;}
+  .win-sprs img:nth-child(3){animation:sBounce .9s .3s ease-in-out infinite;}
+  .win-sprs img:nth-child(4){animation:sBounce .9s .45s ease-in-out infinite;}
+  .win-sprs img:nth-child(5){animation:sBounce .9s .6s ease-in-out infinite;}
+  .replay-btn{font-family:'Press Start 2P',monospace;font-size:12px;padding:14px 28px;background:var(--red);color:var(--yellow);border:3px solid var(--yellow);cursor:pointer;box-shadow:4px 4px 0 var(--darkred);letter-spacing:2px;}
+  .replay-btn:hover{transform:translate(-2px,-2px);}
+
+  @media(max-width:600px){.q-card{padding:16px;}.card-spr-col{display:none;}.ans-input{width:120px;font-size:20px;}.q-text{font-size:18px;}.top-bar{flex-wrap:wrap;}}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+<div class="w-overlay" id="wOverlay"></div>
+
+<!-- TITLE -->
+<div id="title-screen">
+  <div class="title-logo">
+    <h1>ASH'S JOURNEY<br>THROUGH KANTO</h1>
+    <h2>A COUNTING &amp; COMBINATORICS QUEST</h2>
+  </div>
+  <div class="title-starters">
+    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif" alt="Bulbasaur"/>
+    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif" alt="Charmander"/>
+    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/7.gif" alt="Squirtle"/>
+  </div>
+  <svg class="pokeball-spin" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="48" fill="#e3350d" stroke="#222" stroke-width="4"/>
+    <rect x="2" y="46" width="96" height="8" fill="#222"/>
+    <circle cx="50" cy="50" r="48" fill="none" stroke="#222" stroke-width="4"/>
+    <path d="M2,50 A48,48 0 0,1 98,50" fill="#f8f8f8"/>
+    <circle cx="50" cy="50" r="14" fill="#f8f8f8" stroke="#222" stroke-width="4"/>
+    <circle cx="50" cy="50" r="7" fill="#e3350d" stroke="#222" stroke-width="3"/>
+  </svg>
+  <button class="start-btn" onclick="startGame()">▶ PRESS START</button>
+</div>
+
+<!-- GAME -->
+<div id="game-screen">
+  <div class="top-bar">
+    <div class="trainer-info">
+      <img class="pxl trainer-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pikachu"/>
+      <span class="trainer-name">ASH</span>
+    </div>
+    <div class="prog-wrap"><div class="prog-fill" id="progBar" style="width:0%"></div></div>
+    <div class="score-display">
+      <div>SCORE: <span id="scoreVal">0</span></div>
+      <div style="margin-top:4px;font-size:8px;color:var(--gray)">Q <span id="qNum">1</span>/9</div>
+    </div>
+  </div>
+  <div id="qContainer"></div>
+</div>
+
+<!-- WIN -->
+<div id="win-screen">
+  <div class="win-title">POKÉMON LEAGUE<br>CHAMPION!</div>
+  <div class="win-sprs">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pikachu"/>
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/6.gif" alt="Charizard"/>
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/149.gif" alt="Dragonite"/>
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/143.gif" alt="Snorlax"/>
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/131.gif" alt="Lapras"/>
+  </div>
+  <div class="win-score">
+    FINAL SCORE: <span id="finalScore">0</span> / 9<br>
+    <span id="winMsg" style="color:var(--yellow)"></span>
+  </div>
+  <button class="replay-btn" onclick="location.reload()">↺ PLAY AGAIN</button>
+</div>
+
+<script>
+const GIF = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
+
+const questions = [
+  {
+    loc:"🌲 Viridian Forest", type:"Fundamental Counting Principle",
+    q:"Ash stocks up at the Poké Mart. He can choose:",
+    bullets:["1 of 3 starters (Bulbasaur, Charmander, or Squirtle)","1 of 4 Potions (Potion, Super Potion, Hyper Potion, Max Potion)","1 of 3 Repel sprays (Repel, Super Repel, Max Repel)"],
+    ask:"How many different combinations can Ash pack?",
+    answers:[36], labels:null,
+    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(1)}" alt="Bulbasaur"/><img class="pxl" src="${GIF(4)}" alt="Charmander"/><img class="pxl" src="${GIF(7)}" alt="Squirtle"/></div><div class="spr-label">Choose wisely!</div>`,
+    resSpr: GIF(25),
+    solution:{steps:["Use the Fundamental Counting Principle: multiply the choices at each step.","Starters: 3 choices","Potions: 4 choices","Repels: 3 choices","3 × 4 × 3 = 36"],final:"Answer: 36 combinations"}
+  },
+  {
+    loc:"🌑 Mt. Moon", type:"Additive Counting Principle",
+    q:"A scientist lets Ash take one fossil from one table:",
+    bullets:["Table A: 5 Dome Fossils","Table B: 3 Helix Fossils","Table C: 4 Old Amber stones"],
+    ask:"Ash picks from ONE table only. How many total choices?",
+    answers:[12], labels:null,
+    cardSprite:`<img class="pxl float lg" src="${GIF(35)}" alt="Clefairy"/><div class="spr-label">Clefairy</div>`,
+    resSpr: GIF(35),
+    solution:{steps:["Ash picks from ONE table only — use the Additive Counting Principle: add the choices.","Table A: 5  |  Table B: 3  |  Table C: 4","5 + 3 + 4 = 12"],final:"Answer: 12 total choices"}
+  },
+  {
+    loc:"🚢 SS Anne", type:"Factorials",
+    q:"The captain wants 7 different Pokémon to march in a single-file line on deck.",
+    bullets:[],
+    ask:"In how many ways can all 7 Pokémon be arranged?",
+    answers:[5040], labels:null,
+    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(54)}" alt="Psyduck"/><img class="pxl" src="${GIF(52)}" alt="Meowth"/><img class="pxl" src="${GIF(25)}" alt="Pikachu"/><img class="pxl" src="${GIF(39)}" alt="Jigglypuff"/><img class="pxl" src="${GIF(74)}" alt="Geodude"/><img class="pxl" src="${GIF(63)}" alt="Abra"/><img class="pxl" src="${GIF(50)}" alt="Diglett"/></div><div class="spr-label">7 Pokémon march!</div>`,
+    resSpr: GIF(25),
+    solution:{steps:["All 7 Pokémon are placed in a line — use a full factorial.","7! = 7 × 6 × 5 × 4 × 3 × 2 × 1","= 5040"],final:"Answer: 5,040 arrangements"}
+  },
+  {
+    loc:"👻 Lavender Town", type:"Permutations P(n,r)",
+    q:"A caretaker asks Ash to place 3 memorial candles in a row, chosen from 8 different colored candles. Order matters — each arrangement sends a different message.",
+    bullets:[],
+    ask:"How many ordered arrangements of 3 candles from 8?",
+    answers:[336], labels:null,
+    cardSprite:`<img class="pxl float lg" src="${GIF(93)}" alt="Haunter"/><div class="spr-label">Haunter</div>`,
+    resSpr: GIF(94),
+    solution:{steps:["Use the Permutation formula: P(n,r) = n! / (n−r)!","P(8,3) = 8! / 5! = 8 × 7 × 6","= 56 × 6"],final:"Answer: 336 ordered arrangements"}
+  },
+  {
+    loc:"🎰 Celadon Game Corner", type:"Permutations with Identical Elements",
+    q:"A prize machine scrambles letter tiles to spell a Pokémon's name. The tiles are:",
+    bullets:["R, A, T, T, A, T, A  (7 letters: 3 T's, 3 A's, 1 R)"],
+    ask:"How many distinct arrangements can the machine display?",
+    answers:[140], labels:null,
+    cardSprite:`<img class="pxl bounce lg" src="${GIF(19)}" alt="Rattata"/><div class="spr-label">Rattata!</div>`,
+    resSpr: GIF(19),
+    solution:{steps:["When elements repeat, divide by each repeated count's factorial.","Formula: n! / (n₁! × n₂! × ...)","= 7! / (3! × 3! × 1!)","= 5040 / (6 × 6 × 1)","= 5040 / 36"],final:"Answer: 140 distinct arrangements"}
+  },
+  {
+    loc:"⚡ Power Plant", type:"Tree Diagrams",
+    q:"The security system has two checkpoints:",
+    bullets:["Checkpoint 1: Press one of 3 buttons — Red, Blue, or Yellow","Checkpoint 2: Flip one of 2 switches — Up or Down"],
+    ask:"How many total button-and-switch combinations are there?",
+    answers:[6], labels:null,
+    cardSprite:`<img class="pxl float lg" src="${GIF(145)}" alt="Zapdos"/><div class="spr-label">Zapdos</div>`,
+    resSpr: GIF(145),
+    solution:{steps:["Draw branches: each button (R, B, Y) leads to 2 switch options (Up, Down).","Red→Up, Red→Down | Blue→Up, Blue→Down | Yellow→Up, Yellow→Down","Total = 3 × 2"],final:"Answer: 6 combinations"}
+  },
+  {
+    loc:"🧊 Seafoam Islands", type:"Combinations C(n,r)",
+    q:"Ash finds a bag with 8 different Ice-type TMs. He can only carry 3, and the order doesn't matter.",
+    bullets:[],
+    ask:"How many different groups of 3 TMs can Ash choose?",
+    answers:[56], labels:null,
+    cardSprite:`<img class="pxl float lg" src="${GIF(144)}" alt="Articuno"/><div class="spr-label">Articuno</div>`,
+    resSpr: GIF(144),
+    solution:{steps:["Use the Combination formula: C(n,r) = n! / (r! × (n−r)!)","C(8,3) = 8! / (3! × 5!)","= (8 × 7 × 6) / (3 × 2 × 1)","= 336 / 6"],final:"Answer: 56 different groups"}
+  },
+  {
+    loc:"🏟 Indigo Plateau", type:"Pascal's Triangle",
+    q:"Ash has 9 Pokémon. Gary says he can only bring 4 for the warm-up round. Use Pascal's Triangle to find C(9, 4).",
+    bullets:[],
+    ask:"How many different groups of 4 can Ash make?",
+    answers:[126], labels:null,
+    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(6)}" alt="Charizard"/><img class="pxl" src="${GIF(65)}" alt="Alakazam"/><img class="pxl" src="${GIF(68)}" alt="Machamp"/><img class="pxl" src="${GIF(112)}" alt="Rhydon"/></div><div class="spr-label">Pick your team!</div>`,
+    resSpr: GIF(6),
+    solution:{steps:["Pascal's Triangle row 9 (rows start at 0):","Row 9: 1, 9, 36, 84, 126, 126, 84, 36, 9, 1","C(9,4) is the 5th value (index 4) in row 9.","Verify: 9! / (4! × 5!) = 3024 / 24 = 126"],final:"Answer: 126 different groups"}
+  },
+  {
+    loc:"🔥 Cinnabar Island Lab", type:"Venn Diagrams",
+    q:"Researchers study 30 of Ash's Pokémon and find:",
+    bullets:["17 know at least one Fire-type move","14 know at least one Psychic-type move","6 know both Fire and Psychic moves"],
+    ask:"Answer both parts below:",
+    answers:[25,5], labels:["(a) Know at least one move type?","(b) Know neither?"],
+    cardSprite:`<img class="pxl float lg" src="${GIF(150)}" alt="Mewtwo"/><div class="spr-label">Mewtwo</div>`,
+    resSpr: GIF(150),
+    solution:{steps:["Use the Inclusion-Exclusion Principle.","A ∪ B = |A| + |B| − |A ∩ B|","(a): 17 + 14 − 6 = 25 know at least one","(b): 30 − 25 = 5 know neither"],final:"Answers: (a) 25 Pokémon   (b) 5 Pokémon"}
+  }
+];
+
+let cur=0, score=0, answered=false;
+
+function startGame(){
+  document.getElementById('title-screen').classList.add('hidden');
+  setTimeout(()=>{document.getElementById('game-screen').classList.add('active');renderQ();},800);
+}
+
+function renderQ(){
+  answered=false;
+  const q=questions[cur];
+  document.getElementById('qNum').textContent=cur+1;
+  document.getElementById('progBar').style.width=((cur/9)*100)+'%';
+  const bullets=q.bullets.length?`<ul class="q-list">${q.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>`:'';
+  let inputs='';
+  if(q.labels){
+    inputs=`<div class="multi-inputs">${q.labels.map((l,i)=>`<div class="mi-row"><span class="mi-label">${l}</span><input class="ans-input" id="ans_${i}" type="number" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')checkAns()"/></div>`).join('')}</div>`;
+  } else {
+    inputs=`<input class="ans-input" id="ans_0" type="number" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')checkAns()"/>`;
+  }
+  const isLast=cur===questions.length-1;
+  document.getElementById('qContainer').innerHTML=`
+    <div class="loc-badge">📍 ${q.loc}</div>
+    <div class="q-card" id="qCard">
+      <div class="card-inner">
+        <div class="card-text">
+          <div class="q-num">QUESTION ${cur+1} OF 9</div>
+          <div class="q-type">⚔ ${q.type}</div>
+          <div class="q-text">${q.q}</div>
+          ${bullets}
+          <div class="q-text" style="color:var(--yellow);font-size:19px;">${q.ask}</div>
+          <div class="ans-row">${inputs}<button class="sub-btn" id="subBtn" onclick="checkAns()">CONFIRM ▶</button></div>
+        </div>
+        <div class="card-spr-col">${q.cardSprite}</div>
+      </div>
+    </div>
+    <div class="res-panel" id="resPanel"></div>
+    <button class="next-btn" id="nextBtn" onclick="${isLast?'showWin()':'nextQ()'}">
+      ${isLast?'🏆 FINISH JOURNEY':'NEXT LOCATION ▶'}
+    </button>`;
+  setTimeout(()=>{const f=document.getElementById('ans_0');if(f)f.focus();},100);
+}
+
+function checkAns(){
+  if(answered)return;
+  const q=questions[cur];
+  const userAns=[];
+  for(let i=0;i<q.answers.length;i++){
+    const el=document.getElementById(`ans_${i}`);
+    if(!el||el.value==='')return;
+    userAns.push(parseInt(el.value));
+  }
+  const allOk=userAns.every((v,i)=>v===q.answers[i]);
+  answered=true;
+  document.getElementById('subBtn').disabled=true;
+  document.querySelectorAll('.ans-input').forEach(e=>e.disabled=true);
+  const card=document.getElementById('qCard');
+  const panel=document.getElementById('resPanel');
+  const nextBtn=document.getElementById('nextBtn');
+  const sprites=card.querySelectorAll('img.pxl');
+
+  if(allOk){
+    score++;
+    document.getElementById('scoreVal').textContent=score;
+    card.classList.add('c-flash');
+    sprites.forEach(s=>{s.classList.remove('bounce','float');void s.offsetWidth;s.classList.add('spin-in');});
+    spawnPtcls();
+    panel.className='res-panel good show';
+    panel.innerHTML=`
+      <div class="res-inner">
+        <div class="res-spr"><img src="${q.resSpr}" alt="pokemon"/><div class="spr-label" style="color:var(--green)">NICE!</div></div>
+        <div class="res-content">
+          <div class="res-hdr good-hdr">✅ CORRECT! +1 POINT</div>
+          <div style="font-size:18px;color:rgba(255,255,255,.7);margin-bottom:12px;">Want to see the solution?</div>
+          <div class="choice-btns">
+            <button class="cbtn yes" onclick="revealSol()">📖 YES, SHOW ME</button>
+            <button class="cbtn no" onclick="skipSol()">⏭ SKIP</button>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    card.classList.add('shake');
+    sprites.forEach(s=>{s.classList.remove('bounce','float');void s.offsetWidth;s.classList.add('shake-spr');});
+    document.getElementById('wOverlay').classList.add('flash');
+    setTimeout(()=>document.getElementById('wOverlay').classList.remove('flash'),700);
+    panel.className='res-panel wrong show';
+    panel.innerHTML=buildSol(q,true,userAns);
+    nextBtn.classList.add('show');
+  }
+}
+
+function buildSol(q,isWrong,userAns){
+  const hdr=isWrong
+    ?`<div class="res-hdr bad">❌ NOT QUITE...</div><div style="font-size:18px;color:rgba(255,120,120,.9);margin-bottom:14px;">Your answer${userAns.length>1?'s':''}: ${userAns.join(', ')} — Here's the solution:</div>`
+    :`<div class="res-hdr good-hdr" style="margin-bottom:14px;">📖 SOLUTION</div>`;
+  const steps=q.solution.steps.map(s=>`<div class="sol-step">${s}</div>`).join('');
+  return `<div class="res-inner">
+    <div class="res-spr">
+      <img src="${q.resSpr}" alt="pokemon" style="${isWrong?'filter:grayscale(.5)':''}"/>
+      <div class="spr-label" style="color:${isWrong?'var(--red)':'var(--green)'};">${isWrong?'Oops!':'Great!'}</div>
+    </div>
+    <div class="res-content">${hdr}<div class="sol-block">${steps}<div class="sol-ans">${q.solution.final}</div></div></div>
+  </div>`;
+}
+
+function revealSol(){
+  document.getElementById('resPanel').innerHTML=buildSol(questions[cur],false,[]);
+  document.getElementById('nextBtn').classList.add('show');
+}
+function skipSol(){document.getElementById('nextBtn').classList.add('show');}
+function nextQ(){cur++;renderQ();window.scrollTo({top:0,behavior:'smooth'});}
+function showWin(){
+  document.getElementById('progBar').style.width='100%';
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('winMsg').textContent=
+    score===9?'🌟 PERFECT! POKÉMON MASTER!':
+    score>=7?'⭐ EXCELLENT WORK, TRAINER!':
+    score>=5?'👍 GOOD JOB! KEEP TRAINING!':
+    '💪 KEEP PRACTICING, ASH!';
+  document.getElementById('win-screen').classList.add('active');
+}
+function spawnPtcls(){
+  const em=['⭐','✨','💫','🌟','🎉','🏅'];
+  for(let i=0;i<16;i++){
+    const p=document.createElement('div');
+    p.className='ptcl';
+    p.textContent=em[Math.floor(Math.random()*em.length)];
+    p.style.left=(15+Math.random()*70)+'vw';
+    p.style.top=(30+Math.random()*40)+'vh';
+    p.style.setProperty('--d2',(0.7+Math.random()*.9)+'s');
+    p.style.setProperty('--dx',(-90+Math.random()*180)+'px');
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1800);
+  }
+}
+
+// Stars
+const se=document.getElementById('stars');
+for(let i=0;i<120;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  const sz=Math.random()*2.5+.5;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${1.5+Math.random()*3}s;`;
+  se.appendChild(s);
+}
+</script>
+</body>
+</html>
