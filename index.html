@@ -762,7 +762,7 @@ function renderSlide(sd, si) {
 
   const pImg = document.getElementById('dlgPortrait');
   pImg.src = slide.portrait;
-  pImg.style.filter = slide.portrait === PLAYER_SPR ? 'brightness(0)' : 'drop-shadow(0 4px 10px rgba(0,0,0,.9))';
+  pImg.style.filter = slide.portrait === PLAYER_SPR ? 'brightness(0.35) sepia(1) hue-rotate(200deg) saturate(3)' : 'drop-shadow(0 4px 10px rgba(0,0,0,.9))';
 
   const rawName = slide.charName;
   document.getElementById('dlgCharName').textContent = rawName === 'ASH' ? playerName.toUpperCase() : N(rawName);
