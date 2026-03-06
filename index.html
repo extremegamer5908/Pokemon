@@ -97,6 +97,9 @@ img.pxl    { image-rendering:pixelated; filter:drop-shadow(0 3px 7px rgba(0,0,0,
 .name-go-btn { font-family:'Press Start 2P',monospace; font-size:12px; padding:14px 28px; background:var(--red); color:var(--yellow); border:3px solid var(--yellow); cursor:pointer; letter-spacing:2px; box-shadow:4px 4px 0 var(--darkred); width:100%; transition:transform .1s; }
 .name-go-btn:hover  { transform:translate(-2px,-2px); }
 .name-go-btn:active { transform:translate(2px,2px); }
+.gender-btn { font-family:'Press Start 2P',monospace; font-size:11px; padding:12px 20px; background:rgba(255,255,255,.06); color:rgba(255,255,255,.55); border:2px solid rgba(255,255,255,.2); cursor:pointer; letter-spacing:1px; border-radius:3px; transition:all .15s; flex:1; }
+.gender-btn:hover { background:rgba(255,222,0,.1); color:var(--yellow); border-color:var(--yellow); }
+.gender-btn.sel  { background:rgba(255,222,0,.18); color:var(--yellow); border-color:var(--yellow); box-shadow:0 0 12px rgba(255,222,0,.3); }
 
 /* ── STORY SCREEN ── */
 #storyScreen { position:fixed; inset:0; z-index:150; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
@@ -316,6 +319,11 @@ img.pxl    { image-rendering:pixelated; filter:drop-shadow(0 3px 7px rgba(0,0,0,
     <input class="name-inp" id="nameInp" type="text" maxlength="12" placeholder="YOUR NAME"
       onkeydown="if(event.key==='Enter')confirmName()"
       oninput="this.value=this.value.replace(/[^a-zA-Z0-9 ]/g,'')"/>
+    <div style="font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lb);margin-bottom:10px;letter-spacing:1px;">YOUR TRAINER</div>
+    <div style="display:flex;gap:12px;margin-bottom:20px;">
+      <button class="gender-btn" id="genderM" onclick="selectGender('M')">♂ BOY</button>
+      <button class="gender-btn" id="genderF" onclick="selectGender('F')">♀ GIRL</button>
+    </div>
     <button class="name-go-btn" onclick="confirmName()">THAT'S MY NAME! ▶</button>
   </div>
 </div>
@@ -457,7 +465,8 @@ const AURAS = [
 ];
 
 // ── STATE ────────────────────────────────────────────
-let playerName = 'Ash';
+let playerName   = 'Ash';
+let playerGender = 'M';
 let cur = 0, score = 0, answered = false;
 let storyIdx = 0, slideIdx = 0;
 let typeTimer = null, typeDone = false;
@@ -706,6 +715,13 @@ const QS = [
   },
 ];
 
+// ── GENDER SELECTION ──────────────────────────────────
+function selectGender(g) {
+  playerGender = g;
+  document.getElementById('genderM').classList.toggle('sel', g === 'M');
+  document.getElementById('genderF').classList.toggle('sel', g === 'F');
+}
+
 // ── TITLE & NAME ─────────────────────────────────────
 function titleStart() {
   document.getElementById('titleScreen').classList.add('out');
@@ -720,6 +736,15 @@ function confirmName() {
   const raw = document.getElementById('nameInp').value.trim();
   if (!raw) { document.getElementById('nameInp').focus(); return; }
   playerName = raw.replace(/\b\w/g, c => c.toUpperCase());
+  // Set player sprite based on gender
+  window.PLAYER_SPR = playerGender === 'F'
+    ? 'https://play.pokemonshowdown.com/sprites/trainers/leaf.png'
+    : 'https://play.pokemonshowdown.com/sprites/trainers/red.png';
+  // Update all existing story slides that reference the old PLAYER_SPR
+  STORY.forEach(sd => sd.slides.forEach(sl => {
+    if (sl.portrait === PLAYER_SPR || sl.portrait === 'https://play.pokemonshowdown.com/sprites/trainers/red.png' || sl.portrait === 'https://play.pokemonshowdown.com/sprites/trainers/leaf.png')
+      sl.portrait = window.PLAYER_SPR;
+  }));
   document.getElementById('nameScreen').classList.remove('active');
   document.getElementById('hudTrainerName').textContent = playerName.toUpperCase();
   showStory(0);
@@ -762,7 +787,7 @@ function renderSlide(sd, si) {
 
   const pImg = document.getElementById('dlgPortrait');
   pImg.src = slide.portrait;
-  pImg.style.filter = slide.portrait === PLAYER_SPR ? 'brightness(0.35) sepia(1) hue-rotate(200deg) saturate(3)' : 'drop-shadow(0 4px 10px rgba(0,0,0,.9))';
+  pImg.style.filter = 'drop-shadow(0 4px 10px rgba(0,0,0,.9))';;
 
   const rawName = slide.charName;
   document.getElementById('dlgCharName').textContent = rawName === 'ASH' ? playerName.toUpperCase() : N(rawName);
@@ -1087,6 +1112,8 @@ for (let i = 0; i < 140; i++) {
   s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${1.5+Math.random()*3.5}s;`;
   se.appendChild(s);
 }
+
+selectGender('M');
 
 // ── Pokéball click trigger (×5) ────────────────────────
 let _pbClicks = 0, _pbTimer = null;
