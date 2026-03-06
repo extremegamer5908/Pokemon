@@ -6,433 +6,290 @@
 <title>The Journey Through Kanto</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --red:#e3350d;--darkred:#9b0000;--yellow:#ffde00;
-  --blue:#3b4cca;--lb:#6890f0;--white:#f8f8f8;
-  --dark:#1a1a2e;--bg:#0a0a16;--gray:#777;
-  --green:#4caf50;--bd:rgba(255,255,255,0.13);
+/* ── VARIABLES ── */
+:root {
+  --red:#e3350d; --darkred:#9b0000; --yellow:#ffde00;
+  --blue:#3b4cca; --lb:#6890f0; --white:#f8f8f8;
+  --bg:#0a0a16; --gray:#777; --green:#4caf50;
+  --bd:rgba(255,255,255,0.13);
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{background:var(--bg);color:var(--white);font-family:'VT323',monospace;min-height:100vh;overflow-x:hidden;}
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; }
+body { background:var(--bg); color:var(--white); font-family:'VT323',monospace; min-height:100vh; overflow-x:hidden; }
 
-/* ── STARS ── */
-.stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
-.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite alternate;opacity:.5;}
-@keyframes twinkle{from{opacity:.1}to{opacity:.9}}
+/* ── GLOBAL ELEMENTS ── */
+.stars { position:fixed; inset:0; pointer-events:none; z-index:0; }
+.star  { position:absolute; background:#fff; border-radius:50%; animation:twinkle var(--d) ease-in-out infinite alternate; opacity:.5; }
+#bgAura   { position:fixed; inset:0; pointer-events:none; z-index:0; transition:background 1.4s ease; }
+#wipe     { position:fixed; inset:0; background:#000; z-index:900; opacity:0; pointer-events:none; transition:opacity .4s ease; }
+#wipe.in  { opacity:1; }
+#wOverlay { position:fixed; inset:0; background:rgba(200,0,0,.18); pointer-events:none; z-index:901; opacity:0; }
+#wOverlay.flash { animation:rFlash .6s ease; }
+.ptcl { position:fixed; pointer-events:none; z-index:902; font-size:22px; animation:flyUp var(--d2) ease forwards; }
 
-/* ── BG AURA ── */
-#bgAura{position:fixed;inset:0;pointer-events:none;z-index:0;transition:background 1.4s ease;}
+/* ── KEYFRAMES ── */
+@keyframes twinkle   { from{opacity:.1} to{opacity:.9} }
+@keyframes rFlash    { 0%{opacity:0} 20%{opacity:1} 100%{opacity:0} }
+@keyframes flyUp     { 0%{transform:translate(0,0)rotate(0);opacity:1} 100%{transform:translate(var(--dx),-220px)rotate(720deg);opacity:0} }
+@keyframes floatY    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+@keyframes spinBall  { to{transform:rotate(360deg)} }
+@keyframes btnPulse  { 0%,100%{box-shadow:4px 4px 0 var(--darkred),0 0 18px rgba(227,53,13,.4)} 50%{box-shadow:4px 4px 0 var(--darkred),0 0 36px rgba(227,53,13,.85)} }
+@keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+@keyframes cardIn    { from{transform:translateY(18px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes slideIn   { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes hudSlide  { from{transform:translateY(-20px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes stripIn   { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
+@keyframes bannerSlide { from{transform:translateY(-30px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes dlgRise   { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+@keyframes blink     { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes sBounce   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes sFloat    { 0%,100%{transform:translateY(0)rotate(-2deg)} 50%{transform:translateY(-14px)rotate(2deg)} }
+@keyframes sSpinIn   { 0%{transform:scale(0)rotate(-180deg);opacity:0} 100%{transform:scale(1)rotate(0);opacity:1} }
+@keyframes sShake    { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-12px)rotate(-8deg)} 40%{transform:translateX(12px)rotate(8deg)} 60%{transform:translateX(-8px)rotate(-4deg)} 80%{transform:translateX(8px)rotate(4deg)} }
+@keyframes cardShake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-10px)} 30%{transform:translateX(10px)} 45%{transform:translateX(-8px)} 60%{transform:translateX(8px)} 75%{transform:translateX(-4px)} 90%{transform:translateX(4px)} }
+@keyframes cFlash    { 30%{box-shadow:0 0 50px var(--green),inset 0 0 20px rgba(76,175,80,.1)} }
+@keyframes cellShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 
-/* ── SCREEN WIPE ── */
-#wipe{position:fixed;inset:0;background:#000;z-index:900;opacity:0;pointer-events:none;transition:opacity .4s ease;}
-#wipe.in{opacity:1;}
+/* ── SPRITE HELPERS ── */
+img.pxl    { image-rendering:pixelated; filter:drop-shadow(0 3px 7px rgba(0,0,0,.7)); }
+.spr-bounce { animation:sBounce .9s ease-in-out infinite; }
+.spr-float  { animation:sFloat 2.5s ease-in-out infinite; }
+.spr-spin-in { animation:sSpinIn .6s cubic-bezier(.175,.885,.32,1.275) forwards !important; }
+.spr-shake  { animation:sShake .5s ease !important; }
+.spr-silhouette { filter:brightness(0) !important; }
+.spr-row { display:flex; gap:2px; align-items:flex-end; }
+.spr-row img { width:56px; height:56px; }
+.spr-row img:nth-child(1) { animation:sBounce .9s 0s    ease-in-out infinite; }
+.spr-row img:nth-child(2) { animation:sBounce .9s .18s  ease-in-out infinite; }
+.spr-row img:nth-child(3) { animation:sBounce .9s .36s  ease-in-out infinite; }
+.spr-row img:nth-child(4) { animation:sBounce .9s .54s  ease-in-out infinite; }
+.spr-row img:nth-child(5) { animation:sBounce .9s .72s  ease-in-out infinite; }
+.spr-row img:nth-child(6) { animation:sBounce .9s .9s   ease-in-out infinite; }
+.spr-row img:nth-child(7) { animation:sBounce .9s 1.08s ease-in-out infinite; }
+.spr-label { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--gray); text-align:center; letter-spacing:1px; }
 
-/* ── WRONG FLASH ── */
-#wOverlay{position:fixed;inset:0;background:rgba(200,0,0,.18);pointer-events:none;z-index:901;opacity:0;}
-#wOverlay.flash{animation:rFlash .6s ease;}
-@keyframes rFlash{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+/* ── TITLE SCREEN ── */
+#titleScreen { position:fixed; inset:0; z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; background:var(--bg); transition:opacity .8s ease; }
+#titleScreen.out { opacity:0; pointer-events:none; }
+.tlogo { text-align:center; animation:floatY 3s ease-in-out infinite; }
+.tlogo h1 { font-family:'Press Start 2P',monospace; font-size:clamp(13px,3vw,22px); color:var(--yellow); text-shadow:3px 3px 0 var(--darkred),7px 7px 0 rgba(0,0,0,.5); line-height:1.8; letter-spacing:2px; }
+.tlogo h2 { font-family:'Press Start 2P',monospace; font-size:clamp(6px,1.2vw,10px); color:var(--lb); margin-top:8px; text-shadow:2px 2px 0 var(--blue); }
+.title-starters { display:flex; gap:10px; align-items:flex-end; padding:10px 20px; background:rgba(0,0,0,.4); border:2px solid var(--bd); border-radius:4px; }
+.title-starters img { width:80px; height:80px; image-rendering:pixelated; }
+.title-starters img:nth-child(1) { animation:sBounce .9s 0s  ease-in-out infinite; }
+.title-starters img:nth-child(2) { animation:sBounce .9s .3s ease-in-out infinite; }
+.title-starters img:nth-child(3) { animation:sBounce .9s .6s ease-in-out infinite; }
+.pball { width:58px; height:58px; animation:spinBall 4s linear infinite; filter:drop-shadow(0 0 20px rgba(227,53,13,.7)); }
+.start-btn { font-family:'Press Start 2P',monospace; font-size:14px; padding:16px 34px; background:var(--red); color:var(--yellow); border:4px solid var(--yellow); cursor:pointer; letter-spacing:2px; text-shadow:2px 2px 0 var(--darkred); box-shadow:4px 4px 0 var(--darkred); animation:btnPulse 1.6s ease-in-out infinite; transition:transform .1s; }
+.start-btn:hover  { transform:translate(-2px,-2px); }
+.start-btn:active { transform:translate(2px,2px); }
 
-/* ── PARTICLES ── */
-.ptcl{position:fixed;pointer-events:none;z-index:902;font-size:22px;animation:flyUp var(--d2) ease forwards;}
-@keyframes flyUp{0%{transform:translate(0,0)rotate(0);opacity:1}100%{transform:translate(var(--dx),-220px)rotate(720deg);opacity:0}}
+/* ── NAME SCREEN ── */
+#nameScreen { position:fixed; inset:0; z-index:190; display:none; flex-direction:column; align-items:center; justify-content:center; gap:22px; background:var(--bg); }
+#nameScreen.active { display:flex; animation:fadeIn .6s ease; }
+.name-card { background:rgba(8,8,28,.95); border:3px solid var(--yellow); border-radius:6px; padding:36px 40px; text-align:center; max-width:420px; width:90%; animation:cardIn .4s cubic-bezier(.22,1,.36,1); }
+.name-card h2 { font-family:'Press Start 2P',monospace; font-size:clamp(9px,2vw,13px); color:var(--yellow); text-shadow:2px 2px 0 var(--darkred); margin-bottom:10px; letter-spacing:1px; line-height:1.8; }
+.name-card p  { font-size:18px; color:rgba(255,255,255,.6); margin-bottom:22px; line-height:1.6; }
+.name-oak { width:80px; height:80px; image-rendering:auto; animation:sFloat 3s ease-in-out infinite; filter:drop-shadow(0 4px 10px rgba(0,0,0,.9)); margin-bottom:4px; }
+.name-inp { background:rgba(255,255,255,.08); border:3px solid var(--yellow); color:var(--yellow); font-family:'Press Start 2P',monospace; font-size:16px; padding:14px 16px; width:100%; border-radius:3px; outline:none; text-align:center; letter-spacing:2px; margin-bottom:18px; text-transform:uppercase; }
+.name-inp::placeholder { color:rgba(255,222,0,.3); }
+.name-inp:focus { box-shadow:0 0 18px rgba(255,222,0,.3); }
+.name-go-btn { font-family:'Press Start 2P',monospace; font-size:12px; padding:14px 28px; background:var(--red); color:var(--yellow); border:3px solid var(--yellow); cursor:pointer; letter-spacing:2px; box-shadow:4px 4px 0 var(--darkred); width:100%; transition:transform .1s; }
+.name-go-btn:hover  { transform:translate(-2px,-2px); }
+.name-go-btn:active { transform:translate(2px,2px); }
 
-/* ─────────────────────────────
-   TITLE SCREEN
-───────────────────────────── */
-#titleScreen{
-  position:fixed;inset:0;z-index:200;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:20px;background:var(--bg);transition:opacity .8s ease;
-}
-#titleScreen.out{opacity:0;pointer-events:none;}
-.tlogo{text-align:center;animation:floatY 3s ease-in-out infinite;}
-@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
-.tlogo h1{
-  font-family:'Press Start 2P',monospace;font-size:clamp(13px,3vw,22px);
-  color:var(--yellow);text-shadow:3px 3px 0 var(--darkred),7px 7px 0 rgba(0,0,0,.5);
-  line-height:1.8;letter-spacing:2px;
-}
-.tlogo h2{
-  font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.2vw,10px);
-  color:var(--lb);margin-top:8px;text-shadow:2px 2px 0 var(--blue);
-}
-.title-starters{
-  display:flex;gap:10px;align-items:flex-end;
-  padding:10px 20px;background:rgba(0,0,0,.4);border:2px solid var(--bd);border-radius:4px;
-}
-.title-starters img{width:80px;height:80px;image-rendering:pixelated;}
-.title-starters img:nth-child(1){animation:sBounce .9s 0s ease-in-out infinite;}
-.title-starters img:nth-child(2){animation:sBounce .9s .3s ease-in-out infinite;}
-.title-starters img:nth-child(3){animation:sBounce .9s .6s ease-in-out infinite;}
-.pball{width:58px;height:58px;animation:spinBall 4s linear infinite;filter:drop-shadow(0 0 20px rgba(227,53,13,.7));}
-@keyframes spinBall{to{transform:rotate(360deg)}}
-.start-btn{
-  font-family:'Press Start 2P',monospace;font-size:14px;padding:16px 34px;
-  background:var(--red);color:var(--yellow);border:4px solid var(--yellow);cursor:pointer;
-  letter-spacing:2px;text-shadow:2px 2px 0 var(--darkred);
-  box-shadow:4px 4px 0 var(--darkred);
-  animation:btnPulse 1.6s ease-in-out infinite;
-  transition:transform .1s;
-}
-@keyframes btnPulse{0%,100%{box-shadow:4px 4px 0 var(--darkred),0 0 18px rgba(227,53,13,.4)}50%{box-shadow:4px 4px 0 var(--darkred),0 0 36px rgba(227,53,13,.85)}}
-.start-btn:hover{transform:translate(-2px,-2px);}
-.start-btn:active{transform:translate(2px,2px);}
+/* ── STORY SCREEN ── */
+#storyScreen { position:fixed; inset:0; z-index:150; display:none; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+#storyScreen.active { display:flex; }
+.loc-banner { width:100%; max-width:700px; padding:14px 24px; background:rgba(0,0,0,.7); border:3px solid var(--yellow); border-bottom:none; border-radius:4px 4px 0 0; display:flex; align-items:center; gap:14px; animation:bannerSlide .5s cubic-bezier(.22,1,.36,1); }
+.loc-banner .loc-icon { font-size:32px; }
+.loc-name-text { font-family:'Press Start 2P',monospace; font-size:clamp(8px,1.8vw,14px); color:var(--yellow); text-shadow:2px 2px 0 var(--darkred); letter-spacing:1px; }
+.loc-sub-text  { font-family:'VT323',monospace; font-size:18px; color:rgba(255,222,0,.6); margin-top:4px; }
+.dlg-box { width:100%; max-width:700px; background:rgba(5,5,25,.95); border:3px solid var(--yellow); border-top:none; border-radius:0 0 6px 6px; overflow:hidden; animation:dlgRise .4s cubic-bezier(.22,1,.36,1); }
+.dlg-char-row { display:flex; align-items:flex-end; border-bottom:2px solid rgba(255,222,0,.15); min-height:120px; }
+.dlg-portrait { display:flex; flex-direction:column; align-items:center; padding:10px 14px 6px; min-width:114px; flex-shrink:0; border-right:2px solid rgba(255,222,0,.12); background:rgba(0,0,0,.25); }
+.dlg-portrait img { width:88px; height:88px; image-rendering:auto; animation:sFloat 2.8s ease-in-out infinite; }
+.dlg-char-name { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--yellow); margin-top:6px; letter-spacing:1px; text-align:center; }
+.dlg-lines { flex:1; padding:16px 20px; display:flex; align-items:center; }
+.dlg-text { font-family:'VT323',monospace; font-size:22px; line-height:1.55; color:rgba(255,255,255,.93); min-height:66px; }
+.dlg-cursor { display:inline-block; width:10px; height:18px; background:var(--yellow); margin-left:2px; vertical-align:middle; animation:blink .7s step-end infinite; }
+.dlg-continue { padding:10px 20px; text-align:right; font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,222,0,.6); animation:blink .9s ease-in-out infinite; letter-spacing:1px; cursor:pointer; }
+.scene-sprites { display:flex; align-items:flex-end; justify-content:center; gap:8px; padding:8px 0 0; border-top:2px solid rgba(255,222,0,.1); }
+.scene-sprites img { image-rendering:pixelated; filter:drop-shadow(0 4px 8px rgba(0,0,0,.8)); }
 
-/* ─────────────────────────────
-   DIALOGUE / STORY SCREEN
-───────────────────────────── */
-#storyScreen{
-  position:fixed;inset:0;z-index:150;
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  padding:20px;gap:0;
-}
-#storyScreen.active{display:flex;}
+/* ── GAME SCREEN ── */
+#gameScreen { position:relative; z-index:1; max-width:920px; margin:0 auto; padding:16px 16px 60px; display:none; }
+#gameScreen.active { display:block; }
+.hud { display:flex; align-items:center; justify-content:space-between; padding:10px 18px; background:rgba(0,0,0,.55); border:2px solid var(--bd); border-radius:4px; margin-bottom:20px; gap:12px; animation:hudSlide .4s ease; }
+.hud-trainer { display:flex; align-items:center; gap:10px; }
+.hud-pika    { width:44px; height:44px; image-rendering:pixelated; animation:sBounce 1s ease-in-out infinite; }
+.hud-name    { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--yellow); }
+.hud-loc     { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--gray); margin-top:3px; }
+.prog-wrap   { flex:1; height:12px; background:rgba(255,255,255,.1); border:2px solid var(--bd); border-radius:2px; overflow:hidden; max-width:200px; }
+.prog-fill   { height:100%; background:linear-gradient(90deg,var(--blue),var(--yellow)); transition:width .6s ease; box-shadow:0 0 8px var(--yellow); }
+.hud-score   { font-family:'Press Start 2P',monospace; font-size:10px; color:var(--lb); text-align:right; }
+.hud-score span { font-size:8px; color:var(--gray); display:block; margin-top:3px; }
 
-/* Location title banner */
-.loc-title-banner{
-  width:100%;max-width:700px;
-  padding:14px 24px;
-  background:rgba(0,0,0,.7);border:3px solid var(--yellow);border-bottom:none;
-  border-radius:4px 4px 0 0;
-  display:flex;align-items:center;gap:14px;
-  animation:bannerSlide .5s cubic-bezier(.22,1,.36,1);
-}
-@keyframes bannerSlide{from{transform:translateY(-30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.loc-title-banner .loc-icon{font-size:32px;}
-.loc-title-text{
-  font-family:'Press Start 2P',monospace;font-size:clamp(8px,1.8vw,14px);
-  color:var(--yellow);text-shadow:2px 2px 0 var(--darkred);letter-spacing:1px;
-}
-.loc-subtitle{font-family:'VT323',monospace;font-size:18px;color:rgba(255,222,0,.6);margin-top:4px;}
+/* ── QUESTION CARD ── */
+.loc-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(59,76,202,.22); border:2px solid var(--blue); padding:6px 14px; border-radius:2px; margin-bottom:14px; font-size:18px; color:var(--lb); letter-spacing:1px; }
+.q-story-strip { background:rgba(0,0,0,.5); border-left:4px solid var(--yellow); padding:10px 16px; margin-bottom:14px; border-radius:0 4px 4px 0; font-size:17px; color:rgba(255,255,255,.7); line-height:1.5; animation:stripIn .4s ease; }
+.q-card { background:rgba(8,8,28,.9); border:3px solid var(--bd); border-radius:4px; padding:26px 28px; margin-bottom:18px; position:relative; overflow:hidden; transition:border-color .3s; animation:cardIn .4s cubic-bezier(.22,1,.36,1); }
+.q-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--lb),var(--yellow)); }
+.q-card.shake   { animation:cardShake .5s ease; border-color:var(--red) !important; }
+.q-card.c-flash { border-color:var(--green) !important; animation:cFlash .7s ease; }
+.card-inner    { display:flex; gap:18px; align-items:flex-start; }
+.card-text     { flex:1; min-width:0; }
+.card-spr-col  { display:flex; flex-direction:column; align-items:center; gap:8px; padding-top:8px; flex-shrink:0; }
+.card-spr-col img     { width:96px; height:96px; }
+.card-spr-col img.lg  { width:114px; height:114px; }
+.q-num  { font-family:'Press Start 2P',monospace; font-size:9px; color:var(--gray); margin-bottom:12px; letter-spacing:2px; }
+.q-type { display:inline-block; background:rgba(59,76,202,.3); border:1px solid var(--blue); padding:3px 10px; font-family:'Press Start 2P',monospace; font-size:7px; color:var(--lb); border-radius:2px; margin-bottom:14px; letter-spacing:1px; }
+.q-text { font-size:21px; line-height:1.5; color:var(--white); margin-bottom:14px; }
+.q-list { list-style:none; margin-bottom:14px; }
+.q-list li { font-size:18px; color:rgba(255,255,255,.85); padding:3px 0 3px 20px; position:relative; }
+.q-list li::before { content:'▶'; position:absolute; left:0; color:var(--yellow); font-size:12px; top:5px; }
+.multi-inputs { display:flex; flex-direction:column; gap:12px; }
+.mi-row  { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.mi-label { font-size:18px; color:var(--lb); }
+.ans-row  { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+.ans-input { background:rgba(255,255,255,.07); border:2px solid var(--bd); color:var(--white); font-family:'VT323',monospace; font-size:24px; padding:10px 14px; width:150px; border-radius:2px; outline:none; transition:border-color .2s; letter-spacing:1px; }
+.ans-input:focus { border-color:var(--lb); box-shadow:0 0 12px rgba(104,144,240,.3); }
+.sub-btn { font-family:'Press Start 2P',monospace; font-size:10px; padding:12px 18px; background:var(--blue); color:var(--white); border:3px solid var(--lb); cursor:pointer; letter-spacing:1px; box-shadow:3px 3px 0 rgba(0,0,0,.5); transition:transform .1s; }
+.sub-btn:hover    { transform:translate(-1px,-1px); background:var(--lb); }
+.sub-btn:active   { transform:translate(1px,1px); }
+.sub-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; }
 
-/* Dialogue box */
-.dlg-box{
-  width:100%;max-width:700px;
-  background:rgba(5,5,25,.95);border:3px solid var(--yellow);
-  border-top:none;border-radius:0 0 6px 6px;
-  padding:0;overflow:hidden;
-  animation:dlgRise .4s cubic-bezier(.22,1,.36,1);
-}
-@keyframes dlgRise{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+/* ── RESULT PANEL ── */
+.res-panel { margin-top:18px; padding:18px 22px; border-radius:4px; border:3px solid; display:none; }
+.res-panel.wrong { background:rgba(155,0,0,.2); border-color:var(--red); }
+.res-panel.good  { background:rgba(76,175,80,.1); border-color:var(--green); }
+.res-panel.show  { display:block; animation:slideIn .3s ease; }
+.res-inner   { display:flex; gap:18px; align-items:flex-start; }
+.res-spr     { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.res-spr img { width:80px; height:80px; image-rendering:pixelated; }
+.res-content { flex:1; }
+.res-hdr     { font-family:'Press Start 2P',monospace; font-size:11px; margin-bottom:10px; }
+.res-hdr.bad { color:var(--red); }
+.res-hdr.ok  { color:var(--green); }
+.sol-block   { font-size:18px; line-height:1.7; color:rgba(255,255,255,.9); }
+.sol-step    { padding:4px 0; border-bottom:1px solid rgba(255,255,255,.06); }
+.sol-ans     { margin-top:10px; font-family:'Press Start 2P',monospace; font-size:11px; color:var(--yellow); text-shadow:1px 1px 0 var(--darkred); }
+.choice-btns { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.cbtn        { font-family:'Press Start 2P',monospace; font-size:9px; padding:10px 14px; cursor:pointer; border:2px solid; letter-spacing:1px; transition:transform .1s; }
+.cbtn:hover  { transform:translate(-1px,-1px); }
+.cbtn.yes    { background:rgba(76,175,80,.2); color:var(--green); border-color:var(--green); }
+.cbtn.no     { background:rgba(255,255,255,.05); color:var(--gray); border-color:var(--gray); }
+.next-btn    { font-family:'Press Start 2P',monospace; font-size:11px; padding:14px 26px; background:var(--red); color:var(--yellow); border:3px solid var(--yellow); cursor:pointer; letter-spacing:2px; box-shadow:4px 4px 0 var(--darkred); transition:transform .1s,box-shadow .1s; margin-top:18px; display:none; }
+.next-btn.show   { display:inline-block; animation:slideIn .3s ease; }
+.next-btn:hover  { transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--darkred); }
+.next-btn:active { transform:translate(2px,2px); box-shadow:2px 2px 0 var(--darkred); }
 
-/* Character portrait row */
-.dlg-char-row{
-  display:flex;align-items:flex-end;gap:0;
-  border-bottom:2px solid rgba(255,222,0,.15);
-  min-height:110px;
-}
-.dlg-portrait{
-  display:flex;flex-direction:column;align-items:center;
-  padding:10px 14px 6px;min-width:110px;flex-shrink:0;
-  border-right:2px solid rgba(255,222,0,.12);background:rgba(0,0,0,.25);
-}
-.dlg-portrait img{width:72px;height:72px;image-rendering:pixelated;filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));}
-.dlg-portrait img.pxl-float{animation:sFloat 2.8s ease-in-out infinite;}
-.dlg-char-name{
-  font-family:'Press Start 2P',monospace;font-size:7px;color:var(--yellow);
-  margin-top:6px;letter-spacing:1px;text-align:center;
-}
-.dlg-lines{
-  flex:1;padding:16px 20px;display:flex;flex-direction:column;justify-content:center;
-}
-.dlg-text{
-  font-family:'VT323',monospace;font-size:22px;line-height:1.55;
-  color:rgba(255,255,255,.93);min-height:66px;
-}
-.dlg-cursor{
-  display:inline-block;width:10px;height:18px;background:var(--yellow);
-  margin-left:2px;vertical-align:middle;animation:blink .7s step-end infinite;
-}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-.dlg-continue{
-  padding:10px 20px;text-align:right;
-  font-family:'Press Start 2P',monospace;font-size:8px;color:rgba(255,222,0,.6);
-  animation:blink .9s ease-in-out infinite;letter-spacing:1px;cursor:pointer;
-}
+/* ── PASCAL GRID ── */
+.pascal-wrap  { margin:12px 0 16px; padding:12px 10px 10px; background:rgba(0,0,20,.65); border:2px solid rgba(255,222,0,.2); border-radius:4px; overflow-x:auto; }
+.pascal-title { font-family:'Press Start 2P',monospace; font-size:8px; color:rgba(255,222,0,.7); text-align:center; margin-bottom:10px; letter-spacing:1px; }
+.pascal-hint  { font-family:'Press Start 2P',monospace; font-size:6px; color:rgba(104,144,240,.65); text-align:center; margin-top:8px; letter-spacing:1px; }
+.p-row   { display:flex; justify-content:center; gap:3px; margin-bottom:3px; }
+.p-fixed { width:34px; height:30px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.15); border-radius:3px; font-family:'VT323',monospace; font-size:16px; color:rgba(255,255,255,.45); flex-shrink:0; }
+.p-inp   { width:34px; height:30px; text-align:center; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.22); border-radius:3px; font-family:'VT323',monospace; font-size:16px; color:var(--white); outline:none; padding:0; flex-shrink:0; transition:background .2s,border-color .2s; -moz-appearance:textfield; }
+.p-inp::-webkit-outer-spin-button, .p-inp::-webkit-inner-spin-button { -webkit-appearance:none; }
+.p-inp:focus { border-color:rgba(104,144,240,.8); background:rgba(104,144,240,.1); }
+.p-inp.ok  { background:rgba(76,175,80,.22) !important; border-color:#4caf50 !important; color:#a8f0ac !important; }
+.p-inp.err { background:rgba(227,53,13,.22) !important; border-color:#e3350d !important; color:#f08080 !important; animation:cellShake .35s ease; }
+.pascal-confirm { font-family:'Press Start 2P',monospace; font-size:9px; padding:10px 16px; background:var(--blue); color:var(--white); border:2px solid var(--lb); cursor:pointer; letter-spacing:1px; margin-top:10px; display:block; transition:transform .1s; }
+.pascal-confirm:hover     { transform:translate(-1px,-1px); background:var(--lb); }
+.pascal-confirm:disabled  { opacity:.4; cursor:not-allowed; transform:none; }
 
-/* Scene sprite showcase */
-.scene-sprites{
-  display:flex;align-items:flex-end;justify-content:center;gap:8px;
-  padding:8px 0 0;border-top:2px solid rgba(255,222,0,.1);
-}
-.scene-sprites img{image-rendering:pixelated;filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));}
+/* ── SVG DIAGRAMS ── */
+.diag-svg { display:block; margin:14px 0; max-width:100%; border:2px solid rgba(255,222,0,.22); border-radius:4px; background:rgba(0,0,20,.78); }
 
-/* ─────────────────────────────
-   GAME SCREEN
-───────────────────────────── */
-#gameScreen{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:16px 16px 60px;display:none;}
-#gameScreen.active{display:block;}
-
-/* Top HUD */
-.hud{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 18px;background:rgba(0,0,0,.55);
-  border:2px solid var(--bd);border-radius:4px;margin-bottom:20px;gap:12px;
-  animation:hudSlide .4s ease;
-}
-@keyframes hudSlide{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.hud-trainer{display:flex;align-items:center;gap:10px;}
-.hud-pika{width:44px;height:44px;image-rendering:pixelated;animation:sBounce 1s ease-in-out infinite;}
-.hud-name{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);}
-.prog-wrap{flex:1;height:12px;background:rgba(255,255,255,.1);border:2px solid var(--bd);border-radius:2px;overflow:hidden;max-width:200px;}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--yellow));transition:width .6s ease;box-shadow:0 0 8px var(--yellow);}
-.hud-score{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lb);text-align:right;}
-
-/* Story context strip on question */
-.q-story-strip{
-  background:rgba(0,0,0,.5);border-left:4px solid var(--yellow);
-  padding:10px 16px;margin-bottom:14px;border-radius:0 4px 4px 0;
-  font-size:17px;color:rgba(255,255,255,.7);line-height:1.5;
-  animation:stripIn .4s ease;
-}
-@keyframes stripIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-
-/* Sprites */
-img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 3px 7px rgba(0,0,0,.7));}
-@keyframes sBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@keyframes sFloat{0%,100%{transform:translateY(0)rotate(-2deg)}50%{transform:translateY(-14px)rotate(2deg)}}
-@keyframes sSpinIn{0%{transform:scale(0)rotate(-180deg);opacity:0}100%{transform:scale(1)rotate(0);opacity:1}}
-@keyframes sShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-12px)rotate(-8deg)}40%{transform:translateX(12px)rotate(8deg)}60%{transform:translateX(-8px)rotate(-4deg)}80%{transform:translateX(8px)rotate(4deg)}}
-.spr-bounce{animation:sBounce .9s ease-in-out infinite;}
-.spr-float{animation:sFloat 2.5s ease-in-out infinite;}
-.spr-spin-in{animation:sSpinIn .6s cubic-bezier(.175,.885,.32,1.275) forwards!important;}
-.spr-shake{animation:sShake .5s ease!important;}
-
-.loc-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(59,76,202,.22);border:2px solid var(--blue);padding:6px 14px;border-radius:2px;margin-bottom:14px;font-size:18px;color:var(--lb);letter-spacing:1px;}
-
-/* Question card */
-.q-card{
-  background:rgba(8,8,28,.9);border:3px solid var(--bd);border-radius:4px;
-  padding:26px 28px;margin-bottom:18px;position:relative;overflow:hidden;
-  transition:border-color .3s;
-  animation:cardIn .4s cubic-bezier(.22,1,.36,1);
-}
-@keyframes cardIn{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
-.q-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--lb),var(--yellow));}
-.card-inner{display:flex;gap:18px;align-items:flex-start;}
-.card-text{flex:1;min-width:0;}
-.card-spr-col{display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:8px;flex-shrink:0;}
-.card-spr-col img{width:96px;height:96px;}
-.card-spr-col img.lg{width:114px;height:114px;}
-.spr-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gray);text-align:center;letter-spacing:1px;}
-.spr-row{display:flex;gap:2px;align-items:flex-end;}
-.spr-row img{width:56px;height:56px;}
-.spr-row img:nth-child(1){animation:sBounce .9s 0s ease-in-out infinite;}
-.spr-row img:nth-child(2){animation:sBounce .9s .18s ease-in-out infinite;}
-.spr-row img:nth-child(3){animation:sBounce .9s .36s ease-in-out infinite;}
-.spr-row img:nth-child(4){animation:sBounce .9s .54s ease-in-out infinite;}
-.spr-row img:nth-child(5){animation:sBounce .9s .72s ease-in-out infinite;}
-.spr-row img:nth-child(6){animation:sBounce .9s .9s ease-in-out infinite;}
-.spr-row img:nth-child(7){animation:sBounce .9s 1.08s ease-in-out infinite;}
-.q-card.shake{animation:cardShake .5s ease;border-color:var(--red)!important;}
-@keyframes cardShake{0%,100%{transform:translateX(0)}15%{transform:translateX(-10px)}30%{transform:translateX(10px)}45%{transform:translateX(-8px)}60%{transform:translateX(8px)}75%{transform:translateX(-4px)}90%{transform:translateX(4px)}}
-.q-card.c-flash{border-color:var(--green)!important;animation:cFlash .7s ease;}
-@keyframes cFlash{30%{box-shadow:0 0 50px var(--green),inset 0 0 20px rgba(76,175,80,.1)}}
-.q-num{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--gray);margin-bottom:12px;letter-spacing:2px;}
-.q-type{display:inline-block;background:rgba(59,76,202,.3);border:1px solid var(--blue);padding:3px 10px;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lb);border-radius:2px;margin-bottom:14px;letter-spacing:1px;}
-.q-text{font-size:21px;line-height:1.5;color:var(--white);margin-bottom:14px;}
-.q-list{list-style:none;margin-bottom:14px;}
-.q-list li{font-size:18px;color:rgba(255,255,255,.85);padding:3px 0 3px 20px;position:relative;}
-.q-list li::before{content:'▶';position:absolute;left:0;color:var(--yellow);font-size:12px;top:5px;}
-.multi-inputs{display:flex;flex-direction:column;gap:12px;}
-.mi-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.mi-label{font-size:18px;color:var(--lb);}
-.ans-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px;}
-.ans-input{background:rgba(255,255,255,.07);border:2px solid var(--bd);color:var(--white);font-family:'VT323',monospace;font-size:24px;padding:10px 14px;width:150px;border-radius:2px;outline:none;transition:border-color .2s;letter-spacing:1px;}
-.ans-input:focus{border-color:var(--lb);box-shadow:0 0 12px rgba(104,144,240,.3);}
-.sub-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:12px 18px;background:var(--blue);color:var(--white);border:3px solid var(--lb);cursor:pointer;letter-spacing:1px;box-shadow:3px 3px 0 rgba(0,0,0,.5);transition:transform .1s;}
-.sub-btn:hover{transform:translate(-1px,-1px);background:var(--lb);}
-.sub-btn:active{transform:translate(1px,1px);}
-.sub-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-
-/* Result panel */
-.res-panel{margin-top:18px;padding:18px 22px;border-radius:4px;border:3px solid;display:none;position:relative;}
-.res-panel.wrong{background:rgba(155,0,0,.2);border-color:var(--red);}
-.res-panel.good{background:rgba(76,175,80,.1);border-color:var(--green);}
-.res-panel.show{display:block;animation:slideIn .3s ease;}
-@keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.res-inner{display:flex;gap:18px;align-items:flex-start;}
-.res-spr{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;}
-.res-spr img{width:80px;height:80px;image-rendering:pixelated;}
-.res-content{flex:1;}
-.res-hdr{font-family:'Press Start 2P',monospace;font-size:11px;margin-bottom:10px;}
-.res-hdr.bad{color:var(--red);}
-.res-hdr.ok{color:var(--green);}
-.sol-block{font-size:18px;line-height:1.7;color:rgba(255,255,255,.9);}
-.sol-step{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.sol-ans{margin-top:10px;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--yellow);text-shadow:1px 1px 0 var(--darkred);}
-.choice-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
-.cbtn{font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 14px;cursor:pointer;border:2px solid;letter-spacing:1px;transition:transform .1s;}
-.cbtn:hover{transform:translate(-1px,-1px);}
-.cbtn.yes{background:rgba(76,175,80,.2);color:var(--green);border-color:var(--green);}
-.cbtn.no{background:rgba(255,255,255,.05);color:var(--gray);border-color:var(--gray);}
-.next-btn{font-family:'Press Start 2P',monospace;font-size:11px;padding:14px 26px;background:var(--red);color:var(--yellow);border:3px solid var(--yellow);cursor:pointer;letter-spacing:2px;box-shadow:4px 4px 0 var(--darkred);transition:transform .1s,box-shadow .1s;margin-top:18px;display:none;}
-.next-btn.show{display:inline-block;animation:slideIn .3s ease;}
-.next-btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--darkred);}
-.next-btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--darkred);}
-
-/* Pascal grid */
-.pascal-wrap{margin:12px 0 16px;padding:12px 10px 10px;background:rgba(0,0,20,.65);border:2px solid rgba(255,222,0,.2);border-radius:4px;overflow-x:auto;}
-.pascal-title{font-family:'Press Start 2P',monospace;font-size:8px;color:rgba(255,222,0,.7);text-align:center;margin-bottom:10px;letter-spacing:1px;}
-.pascal-hint{font-family:'Press Start 2P',monospace;font-size:6px;color:rgba(104,144,240,.65);text-align:center;margin-top:8px;letter-spacing:1px;}
-.p-row{display:flex;justify-content:center;gap:3px;margin-bottom:3px;}
-.p-fixed{width:34px;height:30px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);border-radius:3px;font-family:'VT323',monospace;font-size:16px;color:rgba(255,255,255,.45);flex-shrink:0;}
-.p-inp{width:34px;height:30px;text-align:center;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.22);border-radius:3px;font-family:'VT323',monospace;font-size:16px;color:var(--white);outline:none;padding:0;flex-shrink:0;transition:background .2s,border-color .2s;-moz-appearance:textfield;}
-.p-inp::-webkit-outer-spin-button,.p-inp::-webkit-inner-spin-button{-webkit-appearance:none;}
-.p-inp:focus{border-color:rgba(104,144,240,.8);background:rgba(104,144,240,.1);}
-.p-inp.ok{background:rgba(76,175,80,.22)!important;border-color:#4caf50!important;color:#a8f0ac!important;}
-.p-inp.err{background:rgba(227,53,13,.22)!important;border-color:#e3350d!important;color:#f08080!important;animation:cellShake .35s ease;}
-@keyframes cellShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-.pascal-confirm{font-family:'Press Start 2P',monospace;font-size:9px;padding:10px 16px;background:var(--blue);color:var(--white);border:2px solid var(--lb);cursor:pointer;letter-spacing:1px;margin-top:10px;display:block;transition:transform .1s;}
-.pascal-confirm:hover{transform:translate(-1px,-1px);background:var(--lb);}
-.pascal-confirm:disabled{opacity:.4;cursor:not-allowed;transform:none;}
-
-/* ─────────────────────────────
-   WIN SCREEN
-───────────────────────────── */
-#winScreen{
-  position:fixed;inset:0;background:var(--bg);z-index:200;
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  gap:18px;text-align:center;padding:20px;
-}
-#winScreen.active{display:flex;animation:fadeIn 1s ease;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.win-title{font-family:'Press Start 2P',monospace;font-size:clamp(12px,2.8vw,22px);color:var(--yellow);text-shadow:4px 4px 0 var(--darkred);animation:floatY 3s ease-in-out infinite;}
-.win-story{max-width:620px;font-size:20px;color:rgba(255,255,255,.8);line-height:1.65;margin-bottom:4px;}
-.win-sprs{display:flex;gap:8px;align-items:flex-end;}
-.win-sprs img{width:78px;height:78px;image-rendering:pixelated;}
-.win-sprs img:nth-child(1){animation:sBounce .9s 0s ease-in-out infinite;}
-.win-sprs img:nth-child(2){animation:sBounce .9s .15s ease-in-out infinite;}
-.win-sprs img:nth-child(3){animation:sBounce .9s .3s ease-in-out infinite;}
-.win-sprs img:nth-child(4){animation:sBounce .9s .45s ease-in-out infinite;}
-.win-sprs img:nth-child(5){animation:sBounce .9s .6s ease-in-out infinite;}
-.win-score-box{font-family:'Press Start 2P',monospace;font-size:clamp(9px,1.8vw,14px);color:var(--lb);line-height:2.2;}
-.replay-btn{font-family:'Press Start 2P',monospace;font-size:12px;padding:14px 28px;background:var(--red);color:var(--yellow);border:3px solid var(--yellow);cursor:pointer;box-shadow:4px 4px 0 var(--darkred);letter-spacing:2px;margin-top:6px;}
-.replay-btn:hover{transform:translate(-2px,-2px);}
-
-/* SVG diagrams */
-.diag-svg{display:block;margin:14px 0;max-width:100%;border:2px solid rgba(255,222,0,.22);border-radius:4px;background:rgba(0,0,20,.78);}
-
+/* ── WIN SCREEN ── */
+#winScreen { position:fixed; inset:0; background:var(--bg); z-index:200; display:none; flex-direction:column; align-items:center; justify-content:center; gap:18px; text-align:center; padding:20px; }
+#winScreen.active { display:flex; animation:fadeIn 1s ease; }
+.win-title { font-family:'Press Start 2P',monospace; font-size:clamp(12px,2.8vw,22px); color:var(--yellow); text-shadow:4px 4px 0 var(--darkred); animation:floatY 3s ease-in-out infinite; }
+.win-story { max-width:620px; font-size:20px; color:rgba(255,255,255,.8); line-height:1.65; margin-bottom:4px; }
+.win-sprs { display:flex; gap:8px; align-items:flex-end; }
+.win-sprs img { width:78px; height:78px; image-rendering:pixelated; }
+.win-sprs img:nth-child(1) { animation:sBounce .9s 0s   ease-in-out infinite; }
+.win-sprs img:nth-child(2) { animation:sBounce .9s .15s ease-in-out infinite; }
+.win-sprs img:nth-child(3) { animation:sBounce .9s .3s  ease-in-out infinite; }
+.win-sprs img:nth-child(4) { animation:sBounce .9s .45s ease-in-out infinite; }
+.win-sprs img:nth-child(5) { animation:sBounce .9s .6s  ease-in-out infinite; }
+.win-score-box { font-family:'Press Start 2P',monospace; font-size:clamp(9px,1.8vw,14px); color:var(--lb); line-height:2.2; }
+.replay-btn { font-family:'Press Start 2P',monospace; font-size:12px; padding:14px 28px; background:var(--red); color:var(--yellow); border:3px solid var(--yellow); cursor:pointer; box-shadow:4px 4px 0 var(--darkred); letter-spacing:2px; margin-top:6px; }
+.replay-btn:hover { transform:translate(-2px,-2px); }
 
 /* ── ADMIN ── */
-#adminLock{position:fixed;bottom:18px;right:18px;z-index:800;width:36px;height:36px;border-radius:50%;background:transparent;border:none;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s;}
-#adminLock.visible{opacity:1;pointer-events:auto;}
-#adminAuth{position:fixed;inset:0;z-index:950;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.85);}
-#adminAuth.show{display:flex;animation:fadeIn .3s ease;}
-.auth-box{background:#0d0d22;border:3px solid var(--yellow);border-radius:6px;padding:32px 36px;text-align:center;max-width:360px;width:90%;animation:cardIn .35s ease;}
-.auth-box h2{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--yellow);margin-bottom:20px;letter-spacing:1px;}
-.auth-box p{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:16px;line-height:1.5;}
-.auth-inp{background:rgba(255,255,255,.08);border:2px solid var(--bd);color:var(--white);font-family:'VT323',monospace;font-size:28px;padding:10px 14px;width:100%;border-radius:3px;outline:none;text-align:center;letter-spacing:4px;margin-bottom:14px;}
-.auth-inp:focus{border-color:var(--yellow);}
-.auth-err{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--red);margin-bottom:10px;min-height:14px;letter-spacing:1px;}
-.auth-btn{font-family:'Press Start 2P',monospace;font-size:10px;padding:11px 22px;background:var(--yellow);color:#000;border:none;cursor:pointer;letter-spacing:1px;width:100%;}
-.auth-btn:hover{background:#ffe733;}
-.auth-close{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--gray);background:none;border:none;cursor:pointer;margin-top:12px;display:block;width:100%;letter-spacing:1px;}
-#adminPanel{position:fixed;inset:0;z-index:940;display:none;flex-direction:column;background:#080814;overflow:hidden;}
-#adminPanel.show{display:flex;animation:fadeIn .25s ease;}
-.adm-top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:#0d0d22;border-bottom:3px solid var(--yellow);flex-shrink:0;flex-wrap:wrap;gap:10px;}
-.adm-top h1{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--yellow);letter-spacing:1px;}
-.adm-top-btns{display:flex;gap:8px;}
-.adm-save-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:8px 14px;cursor:pointer;border:2px solid var(--green);background:var(--green);color:#000;letter-spacing:1px;}
-.adm-close-btn{font-family:'Press Start 2P',monospace;font-size:9px;padding:8px 14px;cursor:pointer;border:2px solid var(--gray);background:rgba(255,255,255,.05);color:var(--gray);letter-spacing:1px;}
-.adm-body{display:flex;flex:1;overflow:hidden;}
-.adm-sidebar{width:190px;flex-shrink:0;background:#0a0a1a;border-right:2px solid rgba(255,255,255,.09);overflow-y:auto;padding:10px 0;}
-.adm-sidebar-title{font-family:'Press Start 2P',monospace;font-size:6px;color:var(--gray);padding:6px 14px 8px;letter-spacing:1px;}
-.adm-tab{display:block;width:100%;text-align:left;padding:9px 14px;background:none;border:none;border-left:3px solid transparent;cursor:pointer;font-family:'VT323',monospace;font-size:17px;color:rgba(255,255,255,.5);transition:all .14s;}
-.adm-tab:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.9);}
-.adm-tab.act{background:rgba(255,222,0,.08);color:var(--yellow);border-left-color:var(--yellow);}
-.adm-content{flex:1;overflow-y:auto;padding:22px 26px;}
-.adm-sec{display:none;}
-.adm-sec.act{display:block;}
-.adm-sec h2{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--yellow);margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid rgba(255,222,0,.2);letter-spacing:1px;}
-.adm-field{margin-bottom:16px;}
-.adm-field label{display:block;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lb);margin-bottom:6px;letter-spacing:1px;}
-.adm-field input,.adm-field textarea,.adm-field select{width:100%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.16);color:var(--white);font-family:'VT323',monospace;font-size:19px;padding:8px 11px;border-radius:3px;outline:none;transition:border-color .2s;resize:vertical;}
-.adm-field input:focus,.adm-field textarea:focus{border-color:var(--yellow);}
-.adm-field textarea{min-height:65px;line-height:1.5;}
-.adm-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.adm-badge{display:inline-block;background:rgba(59,76,202,.3);border:1px solid var(--blue);padding:3px 10px;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lb);border-radius:2px;margin-bottom:12px;}
-.adm-divider{border:none;border-top:1px solid rgba(255,255,255,.07);margin:18px 0;}
-.adm-info{font-size:16px;color:rgba(255,255,255,.4);margin-bottom:12px;line-height:1.55;}
-.adm-bullets-wrap{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;}
-.adm-bullet-row{display:flex;gap:6px;align-items:center;}
-.adm-bullet-row input{flex:1;}
-.adm-bullet-del{background:rgba(227,53,13,.2);border:1px solid var(--red);color:var(--red);font-size:18px;padding:4px 10px;cursor:pointer;border-radius:2px;flex-shrink:0;}
-.adm-add-bullet{font-family:'Press Start 2P',monospace;font-size:8px;padding:8px 12px;background:rgba(59,76,202,.2);border:2px solid var(--blue);color:var(--lb);cursor:pointer;letter-spacing:1px;margin-top:4px;}
-.adm-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--green);color:#000;font-family:'Press Start 2P',monospace;font-size:10px;padding:12px 24px;border-radius:4px;z-index:999;opacity:0;pointer-events:none;transition:opacity .3s;letter-spacing:1px;white-space:nowrap;}
-.adm-toast.show{opacity:1;}
-.adm-hint-chip{display:inline-block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:3px;padding:3px 8px;font-size:14px;color:rgba(255,255,255,.4);margin:2px;}
+#adminLock { position:fixed; bottom:18px; right:18px; z-index:800; width:36px; height:36px; border-radius:50%; background:transparent; border:none; cursor:pointer; opacity:0; pointer-events:none; transition:opacity .3s; }
+#adminLock.visible { opacity:1; pointer-events:auto; }
+#adminAuth { position:fixed; inset:0; z-index:950; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.85); }
+#adminAuth.show { display:flex; animation:fadeIn .3s ease; }
+.auth-box { background:#0d0d22; border:3px solid var(--yellow); border-radius:6px; padding:32px 36px; text-align:center; max-width:360px; width:90%; animation:cardIn .35s ease; }
+.auth-box h2 { font-family:'Press Start 2P',monospace; font-size:11px; color:var(--yellow); margin-bottom:20px; letter-spacing:1px; }
+.auth-box p  { font-size:16px; color:rgba(255,255,255,.6); margin-bottom:16px; line-height:1.5; }
+.auth-inp  { background:rgba(255,255,255,.08); border:2px solid var(--bd); color:var(--white); font-family:'VT323',monospace; font-size:28px; padding:10px 14px; width:100%; border-radius:3px; outline:none; text-align:center; letter-spacing:4px; margin-bottom:14px; }
+.auth-inp:focus { border-color:var(--yellow); }
+.auth-err  { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--red); margin-bottom:10px; min-height:14px; letter-spacing:1px; }
+.auth-btn  { font-family:'Press Start 2P',monospace; font-size:10px; padding:11px 22px; background:var(--yellow); color:#000; border:none; cursor:pointer; letter-spacing:1px; width:100%; }
+.auth-btn:hover { background:#ffe733; }
+.auth-close { font-family:'Press Start 2P',monospace; font-size:8px; color:var(--gray); background:none; border:none; cursor:pointer; margin-top:12px; display:block; width:100%; letter-spacing:1px; }
+#adminPanel { position:fixed; inset:0; z-index:940; display:none; flex-direction:column; background:#080814; overflow:hidden; }
+#adminPanel.show { display:flex; animation:fadeIn .25s ease; }
+.adm-top { display:flex; align-items:center; justify-content:space-between; padding:14px 24px; background:#0d0d22; border-bottom:3px solid var(--yellow); flex-shrink:0; flex-wrap:wrap; gap:10px; }
+.adm-top h1 { font-family:'Press Start 2P',monospace; font-size:11px; color:var(--yellow); letter-spacing:1px; }
+.adm-top-btns { display:flex; gap:8px; }
+.adm-save-btn  { font-family:'Press Start 2P',monospace; font-size:9px; padding:8px 14px; cursor:pointer; border:2px solid var(--green); background:var(--green); color:#000; letter-spacing:1px; }
+.adm-close-btn { font-family:'Press Start 2P',monospace; font-size:9px; padding:8px 14px; cursor:pointer; border:2px solid var(--gray); background:rgba(255,255,255,.05); color:var(--gray); letter-spacing:1px; }
+.adm-body { display:flex; flex:1; overflow:hidden; }
+.adm-sidebar { width:190px; flex-shrink:0; background:#0a0a1a; border-right:2px solid rgba(255,255,255,.09); overflow-y:auto; padding:10px 0; }
+.adm-sidebar-title { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--gray); padding:6px 14px 8px; letter-spacing:1px; }
+.adm-tab { display:block; width:100%; text-align:left; padding:9px 14px; background:none; border:none; border-left:3px solid transparent; cursor:pointer; font-family:'VT323',monospace; font-size:17px; color:rgba(255,255,255,.5); transition:all .14s; }
+.adm-tab:hover { background:rgba(255,255,255,.05); color:rgba(255,255,255,.9); }
+.adm-tab.act   { background:rgba(255,222,0,.08); color:var(--yellow); border-left-color:var(--yellow); }
+.adm-content { flex:1; overflow-y:auto; padding:22px 26px; }
+.adm-sec     { display:none; }
+.adm-sec.act { display:block; }
+.adm-sec h2  { font-family:'Press Start 2P',monospace; font-size:10px; color:var(--yellow); margin-bottom:16px; padding-bottom:10px; border-bottom:2px solid rgba(255,222,0,.2); letter-spacing:1px; }
+.adm-field   { margin-bottom:16px; }
+.adm-field label { display:block; font-family:'Press Start 2P',monospace; font-size:7px; color:var(--lb); margin-bottom:6px; letter-spacing:1px; }
+.adm-field input, .adm-field textarea { width:100%; background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.16); color:var(--white); font-family:'VT323',monospace; font-size:19px; padding:8px 11px; border-radius:3px; outline:none; transition:border-color .2s; resize:vertical; }
+.adm-field input:focus, .adm-field textarea:focus { border-color:var(--yellow); }
+.adm-field textarea { min-height:65px; line-height:1.5; }
+.adm-row     { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.adm-badge   { display:inline-block; background:rgba(59,76,202,.3); border:1px solid var(--blue); padding:3px 10px; font-family:'Press Start 2P',monospace; font-size:7px; color:var(--lb); border-radius:2px; margin-bottom:12px; }
+.adm-divider { border:none; border-top:1px solid rgba(255,255,255,.07); margin:18px 0; }
+.adm-info    { font-size:16px; color:rgba(255,255,255,.4); margin-bottom:12px; line-height:1.55; }
+.adm-bullets-wrap { display:flex; flex-direction:column; gap:6px; margin-bottom:6px; }
+.adm-bullet-row { display:flex; gap:6px; align-items:center; }
+.adm-bullet-row input { flex:1; }
+.adm-bullet-del { background:rgba(227,53,13,.2); border:1px solid var(--red); color:var(--red); font-size:18px; padding:4px 10px; cursor:pointer; border-radius:2px; flex-shrink:0; }
+.adm-add-bullet { font-family:'Press Start 2P',monospace; font-size:8px; padding:8px 12px; background:rgba(59,76,202,.2); border:2px solid var(--blue); color:var(--lb); cursor:pointer; letter-spacing:1px; margin-top:4px; }
+.adm-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:var(--green); color:#000; font-family:'Press Start 2P',monospace; font-size:10px; padding:12px 24px; border-radius:4px; z-index:999; opacity:0; pointer-events:none; transition:opacity .3s; letter-spacing:1px; white-space:nowrap; }
+.adm-toast.show { opacity:1; }
+.adm-hint-chip { display:inline-block; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:3px; padding:3px 8px; font-size:14px; color:rgba(255,255,255,.4); margin:2px; }
 
-
-/* ── NAME ENTRY SCREEN ── */
-#nameScreen{
-  position:fixed;inset:0;z-index:190;
-  display:none;flex-direction:column;align-items:center;justify-content:center;
-  gap:22px;background:var(--bg);
-}
-#nameScreen.active{display:flex;animation:fadeIn .6s ease;}
-.name-card{
-  background:rgba(8,8,28,.95);border:3px solid var(--yellow);border-radius:6px;
-  padding:36px 40px;text-align:center;max-width:420px;width:90%;
-  animation:cardIn .4s cubic-bezier(.22,1,.36,1);
-}
-.name-card h2{
-  font-family:'Press Start 2P',monospace;font-size:clamp(9px,2vw,13px);
-  color:var(--yellow);text-shadow:2px 2px 0 var(--darkred);
-  margin-bottom:10px;letter-spacing:1px;line-height:1.8;
-}
-.name-card p{font-size:18px;color:rgba(255,255,255,.6);margin-bottom:22px;line-height:1.6;}
-.name-inp{
-  background:rgba(255,255,255,.08);border:3px solid var(--yellow);
-  color:var(--yellow);font-family:'Press Start 2P',monospace;font-size:16px;
-  padding:14px 16px;width:100%;border-radius:3px;outline:none;
-  text-align:center;letter-spacing:2px;margin-bottom:18px;
-  text-transform:uppercase;
-}
-.name-inp::placeholder{color:rgba(255,222,0,.3);letter-spacing:1px;}
-.name-inp:focus{box-shadow:0 0 18px rgba(255,222,0,.3);}
-.name-go-btn{
-  font-family:'Press Start 2P',monospace;font-size:12px;padding:14px 28px;
-  background:var(--red);color:var(--yellow);border:3px solid var(--yellow);
-  cursor:pointer;letter-spacing:2px;box-shadow:4px 4px 0 var(--darkred);
-  width:100%;transition:transform .1s;
-}
-.name-go-btn:hover{transform:translate(-2px,-2px);}
-.name-go-btn:active{transform:translate(2px,2px);}
-.name-oak-img{width:72px;height:72px;image-rendering:auto;animation:sFloat 3s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(0,0,0,.9));}
-
-
-/* ── TRAINER PORTRAITS ── */
-.dlg-portrait img.portrait-oak{width:72px;height:72px;image-rendering:auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.9));}
-.dlg-portrait img.portrait-player{
-  width:72px;height:72px;image-rendering:auto;
-  filter:brightness(0) drop-shadow(0 0 12px rgba(104,144,240,.7)) drop-shadow(0 0 24px rgba(104,144,240,.4));
-  animation:sFloat 2.8s ease-in-out infinite;
-}
-.dlg-portrait img.portrait-npc{width:72px;height:72px;image-rendering:pixelated;filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));}
-
-@media(max-width:600px){
-  .q-card{padding:14px;}
-  .card-spr-col{display:none;}
-  .ans-input{width:110px;font-size:20px;}
-  .q-text{font-size:18px;}
-  .hud{flex-wrap:wrap;}
-  .dlg-portrait{min-width:80px;padding:8px 8px 6px;}
-  .dlg-portrait img{width:56px;height:56px;}
+/* ── RESPONSIVE ── */
+@media(max-width:600px) {
+  .q-card { padding:14px; }
+  .card-spr-col { display:none; }
+  .ans-input { width:110px; font-size:20px; }
+  .q-text { font-size:18px; }
+  .hud { flex-wrap:wrap; }
+  .dlg-portrait { min-width:80px; padding:8px 8px 6px; }
+  .dlg-portrait img { width:56px; height:56px; }
 }
 </style>
 </head>
 <body>
+
 <div class="stars" id="stars"></div>
 <div id="bgAura"></div>
 <div id="wipe"></div>
 <div id="wOverlay"></div>
 
-<!-- ══════════ TITLE SCREEN ══════════ -->
+<!-- TITLE SCREEN -->
 <div id="titleScreen">
   <div class="tlogo">
-    <h1 id="gameTitle">THE JOURNEY<br>THROUGH KANTO</h1>
+    <h1>THE JOURNEY<br>THROUGH KANTO</h1>
     <h2>A COUNTING &amp; COMBINATORICS QUEST</h2>
   </div>
   <div class="title-starters">
@@ -440,14 +297,20 @@ img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow
     <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif" alt="Charmander"/>
     <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/7.gif" alt="Squirtle"/>
   </div>
-  <svg class="pball" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#e3350d" stroke="#222" stroke-width="4"/><rect x="2" y="46" width="96" height="8" fill="#222"/><path d="M2,50 A48,48 0 0,1 98,50" fill="#f8f8f8"/><circle cx="50" cy="50" r="14" fill="#f8f8f8" stroke="#222" stroke-width="4"/><circle cx="50" cy="50" r="7" fill="#e3350d" stroke="#222" stroke-width="3"/></svg>
+  <svg class="pball" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="48" fill="#e3350d" stroke="#222" stroke-width="4"/>
+    <rect x="2" y="46" width="96" height="8" fill="#222"/>
+    <path d="M2,50 A48,48 0 0,1 98,50" fill="#f8f8f8"/>
+    <circle cx="50" cy="50" r="14" fill="#f8f8f8" stroke="#222" stroke-width="4"/>
+    <circle cx="50" cy="50" r="7"  fill="#e3350d" stroke="#222" stroke-width="3"/>
+  </svg>
   <button class="start-btn" onclick="titleStart()">▶ PRESS START</button>
 </div>
 
-<!-- ══════════ NAME ENTRY SCREEN ══════════ -->
+<!-- NAME SCREEN -->
 <div id="nameScreen">
   <div class="name-card">
-    <img class="name-oak-img" src="https://play.pokemonshowdown.com/sprites/trainers/oak.png" alt="Oak" style="width:72px;height:72px;"/>
+    <img class="name-oak" src="https://play.pokemonshowdown.com/sprites/trainers/oak.png" alt="Prof. Oak"/>
     <h2>WHAT IS YOUR<br>NAME, TRAINER?</h2>
     <p>Professor Oak needs to know who you are before your journey begins!</p>
     <input class="name-inp" id="nameInp" type="text" maxlength="12" placeholder="YOUR NAME"
@@ -457,19 +320,19 @@ img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow
   </div>
 </div>
 
-<!-- ══════════ STORY SCREEN ══════════ -->
+<!-- STORY SCREEN -->
 <div id="storyScreen">
-  <div class="loc-title-banner" id="storyBanner">
+  <div class="loc-banner">
     <span class="loc-icon" id="storyIcon">🏠</span>
     <div>
-      <div class="loc-title-text" id="storyLocName">PALLET TOWN</div>
-      <div class="loc-subtitle" id="storyLocSub">Where it all begins...</div>
+      <div class="loc-name-text" id="storyLocName">PALLET TOWN</div>
+      <div class="loc-sub-text"  id="storyLocSub">Where it all begins...</div>
     </div>
   </div>
   <div class="dlg-box">
-    <div class="dlg-char-row" id="dlgCharRow">
+    <div class="dlg-char-row">
       <div class="dlg-portrait">
-        <img id="dlgPortrait" src="" alt="character" class="pxl-float"/>
+        <img id="dlgPortrait" src="" alt="character"/>
         <div class="dlg-char-name" id="dlgCharName">PROF. OAK</div>
       </div>
       <div class="dlg-lines">
@@ -481,31 +344,31 @@ img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow
   </div>
 </div>
 
-<!-- ══════════ GAME SCREEN ══════════ -->
+<!-- GAME SCREEN -->
 <div id="gameScreen">
   <div class="hud">
     <div class="hud-trainer">
-      <img class="pxl hud-pika" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pikachu"/>
+      <img class="hud-pika" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pikachu"/>
       <div>
-        <div class="hud-name" id="hudTrainerName">ASH KETCHUM</div>
-        <div style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--gray);margin-top:3px;" id="hudLocName">PALLET TOWN</div>
+        <div class="hud-name" id="hudTrainerName">TRAINER</div>
+        <div class="hud-loc"  id="hudLocName">PALLET TOWN</div>
       </div>
     </div>
     <div class="prog-wrap"><div class="prog-fill" id="progBar" style="width:0%"></div></div>
     <div class="hud-score">
-      <div>SCORE: <span id="scoreVal">0</span></div>
-      <div style="margin-top:3px;font-size:8px;color:var(--gray)">Q <span id="qNum">1</span>/9</div>
+      SCORE: <span id="scoreVal">0</span>
+      <span>Q <span id="qNum">1</span> / 9</span>
     </div>
   </div>
   <div id="qContainer"></div>
 </div>
 
-<!-- ══════════ WIN SCREEN ══════════ -->
+<!-- WIN SCREEN -->
 <div id="winScreen">
-  <div class="win-title" id="winTitle">🏆 POKÉMON LEAGUE CHAMPION! 🏆</div>
+  <div class="win-title" id="winTitle">🏆 CHAMPION! 🏆</div>
   <div class="win-sprs">
-    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" alt="Pikachu"/>
-    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/6.gif" alt="Charizard"/>
+    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif"  alt="Pikachu"/>
+    <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/6.gif"   alt="Charizard"/>
     <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/149.gif" alt="Dragonite"/>
     <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/143.gif" alt="Snorlax"/>
     <img class="pxl" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/131.gif" alt="Lapras"/>
@@ -518,828 +381,9 @@ img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow
   <button class="replay-btn" onclick="location.reload()">↺ PLAY AGAIN</button>
 </div>
 
-<script>
-var playerName='Ash';
-// N() — replace 'Ash' with the player's chosen name at render time
-function N(s){
-  if(!s)return s;
-  return s
-    .replace(/\bAsh's\b/g, playerName+"'s")
-    .replace(/\bAsh\b/g, playerName)
-    .replace(/\bASH\b/g, playerName.toUpperCase());
-}
-
-const GIF=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
-const OAK='https://play.pokemonshowdown.com/sprites/trainers/oak.png';
-const ASH_PIKA='https://play.pokemonshowdown.com/sprites/trainers/red.png';
-const PLAYER_IS_SILHOUETTE=true;
-const GARY=GIF(132);
-
-// ── BG AURAS PER LOCATION ──────────────────────────
-const AURAS=[
-  'radial-gradient(ellipse at 30% 60%,rgba(34,139,34,.18) 0%,transparent 55%),radial-gradient(ellipse at 70% 30%,rgba(59,76,202,.12) 0%,transparent 50%)', // viridian
-  'radial-gradient(ellipse at 50% 50%,rgba(80,60,120,.2) 0%,transparent 60%)',  // mt moon
-  'radial-gradient(ellipse at 40% 70%,rgba(0,80,160,.15) 0%,transparent 55%)',  // ss anne
-  'radial-gradient(ellipse at 50% 50%,rgba(80,0,80,.22) 0%,transparent 60%)',   // lavender
-  'radial-gradient(ellipse at 60% 40%,rgba(160,120,0,.16) 0%,transparent 50%)', // celadon
-  'radial-gradient(ellipse at 50% 50%,rgba(200,180,0,.15) 0%,transparent 55%)', // power plant
-  'radial-gradient(ellipse at 40% 60%,rgba(0,120,200,.18) 0%,transparent 55%)', // seafoam
-  'radial-gradient(ellipse at 50% 50%,rgba(180,50,0,.18) 0%,transparent 55%)',  // indigo
-  'radial-gradient(ellipse at 50% 50%,rgba(160,0,160,.2) 0%,transparent 60%)',  // cinnabar
-];
-
-// ── STORYLINE DATA ───────────────────────────────────
-// Each question has: story[] = array of dialogue slides
-// Each slide: { portrait, charName, lines, sceneSpriteIds (optional) }
-const STORY=[
-  // Q0 intro (Oak) — before Q1
-  {
-    locIcon:'🌿', locName:'PALLET TOWN', locSub:'Where every legend begins...',
-    aura:'radial-gradient(ellipse at 50% 50%,rgba(59,76,202,.18) 0%,transparent 60%)',
-    slides:[
-      {portrait:OAK,charName:'PROF. OAK',lines:"Hello there, Ash!\nWelcome to the world of Pokémon.",sceneSpriteIds:[1,4,7]},
-      {portrait:OAK,charName:'PROF. OAK',lines:"My name is Professor Oak.\nPeople call me the Pokémon Professor.",sceneSpriteIds:[1,4,7]},
-      {portrait:OAK,charName:'PROF. OAK',lines:"Your very own Pokémon legend is about to unfold! You will travel all of Kanto and challenge the Pokémon League.",sceneSpriteIds:null},
-      {portrait:OAK,charName:'PROF. OAK',lines:"But there's a catch, Ash...",sceneSpriteIds:null},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"A catch?! I'm ready for anything, Professor! Pikachu and I can handle it!",sceneSpriteIds:null},
-      {portrait:OAK,charName:'PROF. OAK',lines:"Every challenge on your journey will require COUNTING SKILLS. Solve each one to move forward.\nGood luck, Ash — your adventure begins now!",sceneSpriteIds:null},
-    ]
-  },
-  // Q1 → Viridian Forest
-  {
-    locIcon:'🌲', locName:'VIRIDIAN FOREST', locSub:'Bug Pokémon lurk in the tall grass...',
-    aura:AURAS[0],
-    slides:[
-      {portrait:ASH_PIKA,charName:'ASH',lines:"We're almost at Viridian Forest! But first — I need to pack the right supplies at the Poké Mart.",sceneSpriteIds:[1,4,7]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"There's so many combinations of items to choose from. I better figure out exactly how many options I have!",sceneSpriteIds:null},
-    ]
-  },
-  // Q2 → Mt. Moon
-  {
-    locIcon:'🌑', locName:'MT. MOON', locSub:'Team Rocket is up to no good...',
-    aura:AURAS[1],
-    slides:[
-      {portrait:ASH_PIKA,charName:'ASH',lines:"We made it through Viridian Forest! Now deep inside Mt. Moon, Team Rocket is stealing fossils!",sceneSpriteIds:[52,41]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"I stopped them! A grateful scientist says I can take one fossil as a reward — but which table should I pick from?",sceneSpriteIds:[35]},
-    ]
-  },
-  // Q3 → SS Anne
-  {
-    locIcon:'🚢', locName:'SS ANNE', locSub:'A grand ship docked at Vermilion City...',
-    aura:AURAS[2],
-    slides:[
-      {portrait:ASH_PIKA,charName:'ASH',lines:"Wow — the SS Anne is HUGE! The captain is throwing a grand Pokémon parade on deck.",sceneSpriteIds:[54,52,25,39,74,63,50]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"Seven different Pokémon need to march in a single-file line. How many different orders are possible? This is going to take some counting...",sceneSpriteIds:null},
-    ]
-  },
-  // Q4 → Lavender Town
-  {
-    locIcon:'👻', locName:'LAVENDER TOWN', locSub:'A haunting melody fills the air...',
-    aura:AURAS[3],
-    slides:[
-      {portrait:GIF(93),charName:'HAUNTER',lines:"Heeeheeehee... Welcome to Pokémon Tower, little trainer. The spirits of the departed rest here...",sceneSpriteIds:[93,92,200]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"A-a caretaker is asking me to arrange memorial candles on the altar. The ORDER matters — each arrangement sends a different message to the spirits!",sceneSpriteIds:null},
-    ]
-  },
-  // Q5 → Celadon
-  {
-    locIcon:'🎰', locName:'CELADON GAME CORNER', locSub:'Neon lights and scrambled prizes...',
-    aura:AURAS[4],
-    slides:[
-      {portrait:ASH_PIKA,charName:'ASH',lines:"The Celadon Game Corner! I can't gamble, but there's this cool prize machine that scrambles letter tiles.",sceneSpriteIds:[19]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"The tiles spell out a Pokémon's name — R, A, T, T, A, T, A — but how many different ways can those 7 letters be arranged?",sceneSpriteIds:null},
-    ]
-  },
-  // Q6 → Power Plant
-  {
-    locIcon:'⚡', locName:'POWER PLANT', locSub:'Zapdos nests somewhere inside...',
-    aura:AURAS[5],
-    slides:[
-      {portrait:GIF(145),charName:'ZAPDOS',lines:"ZAP! ...bzzt... This is MY Power Plant. No one enters without getting past the security system first.",sceneSpriteIds:[145]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"There are two checkpoints — one button and one switch. I need to map out every possible combination before I can get through!",sceneSpriteIds:null},
-    ]
-  },
-  // Q7 → Seafoam
-  {
-    locIcon:'🧊', locName:'SEAFOAM ISLANDS', locSub:'Articuno glides through frozen caverns...',
-    aura:AURAS[6],
-    slides:[
-      {portrait:GIF(144),charName:'ARTICUNO',lines:"...These frozen halls belong to me. But a researcher left behind a bag of TMs. You may take some, young trainer.",sceneSpriteIds:[144]},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"There are 8 Ice-type TMs in the bag and I can only carry 3. The ORDER doesn't matter — how many groups can I choose?",sceneSpriteIds:null},
-    ]
-  },
-  // Q8 → Indigo Plateau
-  {
-    locIcon:'🏟', locName:'INDIGO PLATEAU', locSub:'The Pokémon League awaits!',
-    aura:AURAS[7],
-    slides:[
-      {portrait:GARY,charName:'GARY OAK',lines:"Well, well, well... if it isn't loser Ash. You actually made it? ...Smell ya later!",sceneSpriteIds:[132,6]},
-      {portrait:GARY,charName:'GARY OAK',lines:"Wait. Before you enter, PROVE you deserve to be here. I have 9 Pokémon with me — I'll only bring 4 for the warm-up. How many teams can I make?",sceneSpriteIds:null},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"Pascal's Triangle... Professor Oak taught me this! I can work it out row by row. Let's go!",sceneSpriteIds:null},
-    ]
-  },
-  // Q9 → Cinnabar
-  {
-    locIcon:'🔥', locName:'CINNABAR ISLAND LAB', locSub:'Where Mewtwo was born...',
-    aura:AURAS[8],
-    slides:[
-      {portrait:GIF(150),charName:'MEWTWO',lines:"...So. You come to this lab after conquering the League. This is where I was created. I hold no love for humans.",sceneSpriteIds:[150]},
-      {portrait:GIF(150),charName:'MEWTWO',lines:"But even I must acknowledge — the scientists here have been studying your Pokémon. They seek to understand what types they know. Can you help them organise the data?",sceneSpriteIds:null},
-      {portrait:ASH_PIKA,charName:'ASH',lines:"Of course! 30 of my Pokémon, Fire-types and Psychic-types. I'll use a Venn Diagram to sort it out!",sceneSpriteIds:null},
-    ]
-  },
-];
-
-// ── QUESTIONS ──────────────────────────────────────
-const QS=[
-  {
-    loc:'🌲 Viridian Forest',type:'Fundamental Counting Principle',
-    story:'Before entering the forest, Ash stocks up at the Poké Mart.',
-    q:'He can choose:',
-    bullets:['1 of 3 starters (Bulbasaur, Charmander, or Squirtle)','1 of 4 Potions (Potion, Super Potion, Hyper Potion, Max Potion)','1 of 3 Repel sprays (Repel, Super Repel, Max Repel)'],
-    ask:'How many different combinations can Ash pack?',
-    answers:[36],labels:null,
-    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(1)}" alt="Bulbasaur"/><img class="pxl" src="${GIF(4)}" alt="Charmander"/><img class="pxl" src="${GIF(7)}" alt="Squirtle"/></div><div class="spr-label">Choose wisely!</div>`,
-    resSpr:GIF(25),
-    solution:{steps:['Multiply choices at each step — Fundamental Counting Principle.','Starters: 3  ×  Potions: 4  ×  Repels: 3','3 × 4 × 3 = 36'],final:'Answer: 36 combinations'}
-  },
-  {
-    loc:'🌑 Mt. Moon',type:'Additive Counting Principle',
-    story:'A grateful scientist offers Ash one fossil from one of three tables.',
-    q:'The tables contain:',
-    bullets:['Table A: 5 Dome Fossils','Table B: 3 Helix Fossils','Table C: 4 Old Amber stones'],
-    ask:'Ash picks from ONE table only. How many total choices does he have?',
-    answers:[12],labels:null,
-    cardSprite:`<img class="pxl spr-float lg" src="${GIF(35)}" alt="Clefairy"/><div class="spr-label">Clefairy</div>`,
-    resSpr:GIF(35),
-    solution:{steps:['Ash picks from ONE table — use the Additive Counting Principle: add.','Table A: 5  |  Table B: 3  |  Table C: 4','5 + 3 + 4 = 12'],final:'Answer: 12 total choices'}
-  },
-  {
-    loc:'🚢 SS Anne',type:'Factorials',
-    story:'The captain lines up 7 Pokémon for the grand parade on deck.',
-    q:'Seven different Pokémon must march in a single-file line.',
-    bullets:[],
-    ask:'In how many different orders can all 7 Pokémon march?',
-    answers:[5040],labels:null,
-    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(54)}" alt="Psyduck"/><img class="pxl" src="${GIF(52)}" alt="Meowth"/><img class="pxl" src="${GIF(25)}" alt="Pikachu"/><img class="pxl" src="${GIF(39)}" alt="Jigglypuff"/><img class="pxl" src="${GIF(74)}" alt="Geodude"/><img class="pxl" src="${GIF(63)}" alt="Abra"/><img class="pxl" src="${GIF(50)}" alt="Diglett"/></div><div class="spr-label">7 Pokémon march!</div>`,
-    resSpr:GIF(25),
-    solution:{steps:['All 7 Pokémon arranged in a line — full factorial.','7! = 7 × 6 × 5 × 4 × 3 × 2 × 1','= 5040'],final:'Answer: 5,040 arrangements'}
-  },
-  {
-    loc:'👻 Lavender Town',type:'Permutations P(n,r)',
-    story:'A caretaker needs Ash to arrange memorial candles — the ORDER matters.',
-    q:'3 candles in a row are chosen from 8 different coloured candles. Each order sends a different message to the spirits.',
-    bullets:[],
-    ask:'How many different ordered arrangements of 3 candles from 8 are possible?',
-    answers:[336],labels:null,
-    cardSprite:`<img class="pxl spr-float lg" src="${GIF(93)}" alt="Haunter"/><div class="spr-label">Haunter</div>`,
-    resSpr:GIF(94),
-    solution:{steps:['Use the Permutation formula: P(n,r) = n! / (n−r)!','P(8,3) = 8! / (8−3)! = 8! / 5!','= 8 × 7 × 6 = 336'],final:'Answer: 336 ordered arrangements'}
-  },
-  {
-    loc:'🎰 Celadon Game Corner',type:'Permutations with Identical Elements',
-    story:"The prize machine scrambles letters to spell a Pokémon's name.",
-    q:'The tiles shown are:',
-    bullets:['R, A, T, T, A, T, A  —  7 letters:  3 T\'s,  3 A\'s,  1 R'],
-    ask:'How many distinct arrangements can the machine display?',
-    answers:[140],labels:null,
-    cardSprite:`<img class="pxl spr-bounce lg" src="${GIF(19)}" alt="Rattata"/><div class="spr-label">RATTATA!</div>`,
-    resSpr:GIF(19),
-    solution:{steps:['Divide by the factorial of each repeated element.','Formula: n! / (n₁! × n₂! × ...)','= 7! / (3! × 3! × 1!)','= 5040 / (6 × 6 × 1) = 5040 / 36'],final:'Answer: 140 distinct arrangements'}
-  },
-  {
-    loc:'⚡ Power Plant',type:'Tree Diagrams',
-    story:"Zapdos's security system blocks the way. Two checkpoints must be passed.",
-    q:'The two checkpoints are:',
-    bullets:['Checkpoint 1: Press one of 3 buttons — Red, Blue, or Yellow','Checkpoint 2: Flip one of 2 switches — Up or Down'],
-    ask:'Using the tree diagram above, how many total combinations are there?',
-    answers:[6],labels:null,
-    diagramHTML:null, // built below
-    cardSprite:`<img class="pxl spr-float lg" src="${GIF(145)}" alt="Zapdos"/><div class="spr-label">Zapdos</div>`,
-    resSpr:GIF(145),
-    solution:{steps:['Each button branches into 2 switch options — multiply.','Red→Up, Red→Down | Blue→Up, Blue→Down | Yellow→Up, Yellow→Down','Total = 3 × 2 = 6'],final:'Answer: 6 combinations'}
-  },
-  {
-    loc:'🧊 Seafoam Islands',type:'Combinations C(n,r)',
-    story:"Articuno watches as Ash rummages through the researcher's bag of TMs.",
-    q:"The bag holds 8 different Ice-type TMs. Ash can carry 3 — and the order he picks them doesn't matter.",
-    bullets:[],
-    ask:'How many different groups of 3 TMs can Ash choose?',
-    answers:[56],labels:null,
-    cardSprite:`<img class="pxl spr-float lg" src="${GIF(144)}" alt="Articuno"/><div class="spr-label">Articuno</div>`,
-    resSpr:GIF(144),
-    solution:{steps:['Order does not matter — use Combinations: C(n,r) = n! / (r! × (n−r)!)','C(8,3) = 8! / (3! × 5!)','= (8 × 7 × 6) / (3 × 2 × 1) = 336 / 6'],final:'Answer: 56 different groups'}
-  },
-  {
-    loc:'🏟 Indigo Plateau',type:"Pascal's Triangle",
-    story:"Gary challenges Ash: fill Pascal's Triangle to find C(9,4).",
-    q:"Build Pascal's Triangle row by row. Each number is the sum of the two numbers above it. The edges are always 1.",
-    bullets:[],
-    ask:"Fill every cell — when all boxes turn 🟩 green, enter your C(9,4) answer below!",
-    answers:[126],labels:null,
-    pascalMode:true,
-    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(6)}" alt="Charizard"/><img class="pxl" src="${GIF(65)}" alt="Alakazam"/><img class="pxl" src="${GIF(68)}" alt="Machamp"/><img class="pxl" src="${GIF(112)}" alt="Rhydon"/></div><div class="spr-label">Your rival awaits!</div>`,
-    resSpr:GIF(6),
-    solution:{steps:["Pascal's Triangle, row 9 (starting from row 0):","Row 9: 1, 9, 36, 84, 126, 126, 84, 36, 9, 1","C(9,4) = the 5th value in row 9 (index 4).","Verify: 9! / (4! × 5!) = 3024 / 24 = 126"],final:'Answer: C(9,4) = 126 different groups'}
-  },
-  {
-    loc:'🔥 Cinnabar Island Lab',type:'Venn Diagrams',
-    story:'Scientists at the Cinnabar Lab study the types of moves in your Pokémon.',
-    q:"Researchers examine 30 of Ash's Pokémon and find:",
-    bullets:['17 know at least one Fire-type move','14 know at least one Psychic-type move','6 know BOTH a Fire-type and a Psychic-type move'],
-    ask:'Use the Venn Diagram above to answer both parts:',
-    answers:[25,5],labels:['(a) Know at least one move type?','(b) Know neither?'],
-    diagramHTML:null, // built below
-    cardSprite:`<img class="pxl spr-float lg" src="${GIF(150)}" alt="Mewtwo"/><div class="spr-label">Mewtwo</div>`,
-    resSpr:GIF(150),
-    solution:{steps:['Use Inclusion-Exclusion: A ∪ B = |A| + |B| − |A ∩ B|','(a): 17 + 14 − 6 = 25 know at least one move type','(b): 30 − 25 = 5 know neither'],final:'Answers: (a) 25 Pokémon   (b) 5 Pokémon'}
-  },
-];
-
-// ── BUILD SVG DIAGRAMS ───────────────────────────────
-function buildTreeSVG(){
-  var PS="font-family=\"'Press Start 2P',monospace\"",VT="font-family=\"'VT323',monospace\"";
-  var s='<svg class="diag-svg" viewBox="0 0 560 316" width="100%">';
-  s+='<text x="280" y="20" text-anchor="middle" '+PS+' font-size="8" fill="#ffde00">POWER PLANT — SECURITY TREE DIAGRAM</text>';
-  s+='<text x="20" y="63" '+VT+' font-size="13" fill="rgba(104,144,240,.7)">START</text>';
-  s+='<text x="20" y="161" '+VT+' font-size="13" fill="rgba(104,144,240,.7)">BTN</text>';
-  s+='<text x="20" y="258" '+VT+' font-size="13" fill="rgba(104,144,240,.7)">SWITCH</text>';
-  ['97,280','280,280','463,280'].forEach(function(p){var x=parseInt(p);s+='<line x1="280" y1="86" x2="'+x+'" y2="129" stroke="rgba(104,144,240,.45)" stroke-width="2" stroke-dasharray="6,3"/>';});
-  var lines=[[97,52,'#e3350d'],[97,144,'#e3350d'],[280,244,'#6890f0'],[280,316,'#6890f0'],[463,416,'#ccb800'],[463,508,'#ccb800']];
-  [[97,52,144],[280,244,316],[463,416,508]].forEach(function(t,i){var cols=['#e3350d','#6890f0','#ccb800'];s+='<line x1="'+t[0]+'" y1="181" x2="'+t[1]+'" y2="236" stroke="'+cols[i]+'" stroke-width="2"/><line x1="'+t[0]+'" y1="181" x2="'+t[2]+'" y2="236" stroke="'+cols[i]+'" stroke-width="2"/>';});
-  s+='<circle cx="280" cy="62" r="24" fill="#07071e" stroke="#6890f0" stroke-width="2.5"/>';
-  s+='<text x="280" y="57" text-anchor="middle" '+PS+' font-size="6" fill="#6890f0">PRESS</text>';
-  s+='<text x="280" y="70" text-anchor="middle" '+PS+' font-size="6" fill="#6890f0">BUTTON</text>';
-  [[97,'#e3350d','#200000','R','RED'],[280,'#6890f0','#000418','B','BLUE'],[463,'#ffde00','#181200','Y','YLW']].forEach(function(n){
-    s+='<circle cx="'+n[0]+'" cy="155" r="24" fill="'+n[2]+'" stroke="'+n[1]+'" stroke-width="2.5"/>';
-    s+='<text x="'+n[0]+'" y="150" text-anchor="middle" '+PS+' font-size="9" fill="'+n[1]+'">'+n[3]+'</text>';
-    s+='<text x="'+n[0]+'" y="164" text-anchor="middle" '+VT+' font-size="14" fill="'+n[1]+'">'+n[4]+'</text>';
-  });
-  var lv=[[52,'#e3350d','#140000','UP ↑'],[144,'#e3350d','#140000','DN ↓'],[244,'#6890f0','#000416','UP ↑'],[316,'#6890f0','#000416','DN ↓'],[416,'#ffde00','#141000','UP ↑'],[508,'#ffde00','#141000','DN ↓']];
-  lv.forEach(function(l){
-    s+='<rect x="'+(l[0]-30)+'" y="236" width="60" height="28" rx="3" fill="'+l[2]+'" stroke="'+l[1]+'" stroke-width="1.5"/>';
-    s+='<text x="'+l[0]+'" y="256" text-anchor="middle" '+VT+' font-size="17" fill="'+l[1]+'">'+l[3]+'</text>';
-  });
-  s+='<rect x="185" y="292" width="190" height="14" rx="3" fill="rgba(104,144,240,.1)" stroke="rgba(104,144,240,.28)" stroke-width="1"/>';
-  s+='<text x="280" y="303" text-anchor="middle" '+PS+' font-size="6" fill="rgba(104,144,240,.6)">COUNT ALL PATHS →</text>';
-  s+='</svg>';return s;
-}
-
-function buildVennSVG(){
-  var PS="font-family=\"'Press Start 2P',monospace\"",VT="font-family=\"'VT323',monospace\"";
-  var s='<svg class="diag-svg" viewBox="0 0 500 270" width="100%">';
-  s+='<text x="250" y="20" text-anchor="middle" '+PS+' font-size="8" fill="#ffde00">VENN DIAGRAM — ASH\'S POKÉMON  (total: 30)</text>';
-  s+='<rect x="12" y="28" width="476" height="228" rx="6" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.5" stroke-dasharray="7,5"/>';
-  s+='<circle cx="185" cy="155" r="102" fill="rgba(227,53,13,.13)" stroke="#e3350d" stroke-width="2.5"/>';
-  s+='<circle cx="315" cy="155" r="102" fill="rgba(148,0,211,.13)" stroke="#9b20e0" stroke-width="2.5"/>';
-  s+='<text x="143" y="52" text-anchor="middle" '+PS+' font-size="7" fill="#ff5533">🔥 FIRE</text>';
-  s+='<text x="143" y="64" text-anchor="middle" '+PS+' font-size="6" fill="rgba(255,100,60,.75)">(17 total)</text>';
-  s+='<text x="357" y="52" text-anchor="middle" '+PS+' font-size="7" fill="#c060ff">🔮 PSYCHIC</text>';
-  s+='<text x="357" y="64" text-anchor="middle" '+PS+' font-size="6" fill="rgba(190,100,255,.75)">(14 total)</text>';
-  s+='<text x="120" y="154" text-anchor="middle" '+PS+' font-size="7" fill="rgba(255,100,60,.7)">FIRE</text>';
-  s+='<text x="120" y="168" text-anchor="middle" '+PS+' font-size="6" fill="rgba(255,100,60,.5)">ONLY</text>';
-  s+='<text x="250" y="150" text-anchor="middle" '+PS+' font-size="6" fill="rgba(255,220,0,.8)">BOTH</text>';
-  s+='<text x="250" y="162" text-anchor="middle" '+PS+' font-size="6" fill="rgba(255,220,0,.55)">(6 known)</text>';
-  s+='<text x="380" y="154" text-anchor="middle" '+PS+' font-size="7" fill="rgba(190,100,255,.7)">PSYCHIC</text>';
-  s+='<text x="380" y="168" text-anchor="middle" '+PS+' font-size="6" fill="rgba(190,100,255,.5)">ONLY</text>';
-  s+='<circle cx="464" cy="210" r="22" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4,3"/>';
-  s+='<text x="464" y="206" text-anchor="middle" '+VT+' font-size="14" fill="rgba(255,255,255,.35)">?</text>';
-  s+='<text x="464" y="224" text-anchor="middle" '+PS+' font-size="5" fill="rgba(255,255,255,.3)">Neither</text>';
-  s+='<text x="40" y="248" '+PS+' font-size="6" fill="rgba(255,255,255,.3)">Total = 30</text>';
-  s+='</svg>';return s;
-}
-
-QS[5].diagramHTML=buildTreeSVG();
-QS[8].diagramHTML=buildVennSVG();
-
-// ── STATE ──────────────────────────────────────────
-let cur=0,score=0,answered=false;
-let storyIdx=0,slideIdx=0,typeTimer=null,typeStr='',typeDone=false;
-
-// ── TYPEWRITER ─────────────────────────────────────
-function typeWrite(text,el,onDone){
-  if(typeTimer)clearInterval(typeTimer);
-  typeStr=text;typeDone=false;
-  el.innerHTML='';let i=0;
-  var cursor='<span class="dlg-cursor"></span>';
-  typeTimer=setInterval(function(){
-    if(i>=text.length){clearInterval(typeTimer);typeDone=true;el.innerHTML=text.replace(/\n/g,'<br>');if(onDone)onDone();return;}
-    el.innerHTML=text.slice(0,i+1).replace(/\n/g,'<br>')+cursor;i++;
-  },22);
-}
-
-// ── TITLE ─────────────────────────────────────────
-function titleStart(){
-  document.getElementById('titleScreen').classList.add('out');
-  setTimeout(()=>{
-    document.getElementById('titleScreen').style.display='none';
-    document.getElementById('nameScreen').classList.add('active');
-    setTimeout(()=>document.getElementById('nameInp').focus(),200);
-  },800);
-}
-
-function confirmName(){
-  var raw=document.getElementById('nameInp').value.trim();
-  if(!raw){document.getElementById('nameInp').focus();return;}
-  // Capitalize first letter of each word
-  playerName=raw.replace(/\b\w/g,function(c){return c.toUpperCase();});
-  document.getElementById('nameScreen').classList.remove('active');
-  var hn=document.getElementById('hudTrainerName');if(hn)hn.textContent=playerName.toUpperCase();
-  var gt=document.getElementById('gameTitle');if(gt)gt.innerHTML="THE JOURNEY<br>THROUGH KANTO";
-  document.title="The Journey Through Kanto";
-  showStory(0);
-}
-
-// ── SHOW STORY SCREEN ─────────────────────────────
-function showStory(qIdx){
-  storyIdx=qIdx; slideIdx=0;
-  const sd=STORY[qIdx];
-  document.getElementById('bgAura').style.background=sd.aura||'none';
-  document.getElementById('storyScreen').classList.add('active');
-  renderSlide(sd,0);
-}
-
-function renderSlide(sd,si){
-  const slide=sd.slides[si];
-  document.getElementById('storyIcon').textContent=sd.locIcon;
-  document.getElementById('storyLocName').textContent=sd.locName;
-  document.getElementById('storyLocSub').textContent=sd.locSub;
-  var pImg=document.getElementById('dlgPortrait');
-  pImg.src=slide.portrait;
-  pImg.className='pxl-float';
-  if(slide.portrait===OAK){pImg.className='portrait-oak';}
-  else if(slide.portrait===ASH_PIKA){pImg.className='portrait-player';}
-  else{pImg.className='portrait-npc';}
-  document.getElementById('dlgCharName').textContent=slide.charName==='ASH'?playerName.toUpperCase():N(slide.charName);
-  document.getElementById('dlgContinue').style.opacity='0';
-
-  // Scene sprites
-  const sc=document.getElementById('sceneSprites');
-  if(slide.sceneSpriteIds&&slide.sceneSpriteIds.length){
-    sc.style.display='flex';
-    sc.innerHTML=slide.sceneSpriteIds.map((id,i)=>`<img class="pxl" src="${GIF(id)}" alt="" style="width:${i===0?64:52}px;height:${i===0?64:52}px;animation:sBounce .9s ${i*.2}s ease-in-out infinite;"/>`).join('');
-  } else {
-    sc.style.display='none'; sc.innerHTML='';
-  }
-
-  typeWrite(N(slide.lines),document.getElementById('dlgText'),()=>{
-    document.getElementById('dlgContinue').style.opacity='1';
-  });
-}
-
-function advanceStory(){
-  // Skip typewriter if still running
-  if(!typeDone){
-    clearInterval(typeTimer);typeDone=true;
-    const sd=STORY[storyIdx];
-    const slide=sd.slides[slideIdx];
-    document.getElementById('dlgText').innerHTML=N(slide.lines).replace(/\n/g,'<br>');
-    document.getElementById('dlgContinue').style.opacity='1';
-    return;
-  }
-  const sd=STORY[storyIdx];
-  slideIdx++;
-  if(slideIdx<sd.slides.length){
-    renderSlide(sd,slideIdx);
-  } else {
-    // Done with story, go to question
-    doWipe(()=>{
-      document.getElementById('storyScreen').classList.remove('active');
-      document.getElementById('gameScreen').classList.add('active');
-      renderQ();
-    });
-  }
-}
-
-// ── WIPE TRANSITION ───────────────────────────────
-function doWipe(cb){
-  const w=document.getElementById('wipe');
-  w.classList.add('in');
-  setTimeout(()=>{cb();setTimeout(()=>w.classList.remove('in'),300);},400);
-}
-
-// ── RENDER QUESTION ───────────────────────────────
-function genPascalHTML(){
-  var ROWS=[[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1],[1,5,10,10,5,1],
-            [1,6,15,20,15,6,1],[1,7,21,35,35,21,7,1],
-            [1,8,28,56,70,56,28,8,1],[1,9,36,84,126,126,84,36,9,1]];
-  var h='<div class="pascal-wrap">';
-  h+='<div class="pascal-title">▶ BUILD PASCAL\'S TRIANGLE — ROWS 0 TO 9</div>';
-  ROWS.forEach(function(row,r){
-    h+='<div class="p-row">';
-    if(r===0){h+='<div class="p-fixed">1</div>';}
-    else{row.forEach(function(val,c){var edge=(c===0||c===row.length-1);
-      if(edge)h+='<div class="p-fixed">1</div>';
-      else h+='<input class="p-inp" type="number" data-val="'+val+'" placeholder="?" autocomplete="off" oninput="checkPCell(this)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();}"/>';
-    });}
-    h+='</div>';
-  });
-  h+='<div class="pascal-hint">🔵 EACH CELL = SUM OF THE TWO CELLS ABOVE &nbsp;|&nbsp; EDGES ARE ALWAYS 1</div>';
-  h+='<div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
-  h+='<span style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:#ffde00;">C(9,4) =</span>';
-  h+='<input class="ans-input" id="pascal_final" type="number" placeholder="?" autocomplete="off" style="width:110px;" onkeydown="if(event.key===\'Enter\'){event.preventDefault();checkPascalAns();}"/>';
-  h+='</div>';
-  h+='<button class="pascal-confirm" id="pascalBtn" onclick="checkPascalAns()">CONFIRM TRIANGLE ▶</button>';
-  h+='</div>';
-  return h;
-}
-
-function renderQ(){
-  answered=false;
-  const q=QS[cur];
-  document.getElementById('qNum').textContent=cur+1;
-  document.getElementById('hudLocName').textContent=q.loc;
-  document.getElementById('progBar').style.width=((cur/9)*100)+'%';
-  document.getElementById('bgAura').style.background=AURAS[cur]||'none';
-
-  const bullets=q.bullets.length?`<ul class="q-list">${q.bullets.map(b=>`<li>${N(b)}</li>`).join('')}</ul>`:'';
-  let inputs='';
-  if(q.labels){
-    inputs=`<div class="multi-inputs">${q.labels.map((l,i)=>`<div class="mi-row"><span class="mi-label">${l}</span><input class="ans-input" id="ans_${i}" type="number" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')checkAns()"/></div>`).join('')}</div>`;
-  } else {
-    inputs=`<input class="ans-input" id="ans_0" type="number" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')checkAns()"/>`;
-  }
-  const isLast=cur===QS.length-1;
-  const pascalGrid=q.pascalMode?genPascalHTML():'';
-  const ansRow=q.pascalMode?'':`<div class="ans-row">${inputs}<button class="sub-btn" id="subBtn" onclick="checkAns()">CONFIRM ▶</button></div>`;
-
-  document.getElementById('qContainer').innerHTML=`
-    <div class="loc-badge">📍 ${q.loc}</div>
-    <div class="q-story-strip">💬 ${N(q.story)}</div>
-    <div class="q-card" id="qCard">
-      <div class="card-inner">
-        <div class="card-text">
-          <div class="q-num">QUESTION ${cur+1} OF 9</div>
-          <div class="q-type">⚔ ${q.type}</div>
-          <div class="q-text">${N(q.q)}</div>
-          ${bullets}
-          ${q.diagramHTML||''}
-          ${pascalGrid}
-          <div class="q-text" style="color:var(--yellow);font-size:19px;">${N(q.ask)}</div>
-          ${ansRow}
-        </div>
-        <div class="card-spr-col">${q.cardSprite}</div>
-      </div>
-    </div>
-    <div class="res-panel" id="resPanel"></div>
-    <button class="next-btn" id="nextBtn" onclick="${isLast?'showWin()':'goNextQ()'}">
-      ${isLast?'🏆 FINISH JOURNEY':'NEXT LOCATION ▶'}
-    </button>`;
-  setTimeout(()=>{const f=document.getElementById('ans_0');if(f)f.focus();},120);
-}
-
-// ── PASCAL CELL CHECK ─────────────────────────────
-function checkPCell(el){
-  var v=el.value.trim();
-  el.classList.remove('ok','err');
-  if(!v)return;
-  parseInt(v)===parseInt(el.dataset.val)?el.classList.add('ok'):(el.classList.add('err'));
-  var all=document.querySelectorAll('.p-inp');
-  var finalEl=document.getElementById('pascal_final');
-  if([...all].every(i=>i.classList.contains('ok'))&&finalEl&&parseInt(finalEl.value)===126)
-    setTimeout(checkPascalAns,300);
-}
-
-function checkPascalAns(){
-  if(answered)return;
-  var all=document.querySelectorAll('.p-inp');
-  var anyEmpty=[...all].some(i=>!i.value.trim());
-  var anyWrong=[...all].some(i=>!i.classList.contains('ok'));
-  var finalEl=document.getElementById('pascal_final');
-  var finalOk=finalEl&&parseInt(finalEl.value)===126;
-  if(anyEmpty){var f=[...all].find(i=>!i.value.trim());if(f)f.focus();return;}
-  if(!finalEl||!finalEl.value.trim()){if(finalEl)finalEl.focus();return;}
-  if(anyWrong||!finalOk){
-    all.forEach(i=>{if(!i.classList.contains('ok')){i.classList.remove('err');void i.offsetWidth;i.classList.add('err');}});
-    if(finalEl){finalEl.style.borderColor=finalOk?'#4caf50':'#e3350d';finalEl.style.background=finalOk?'rgba(76,175,80,.18)':'rgba(227,53,13,.18)';}
-    document.getElementById('qCard').classList.remove('shake');void document.getElementById('qCard').offsetWidth;document.getElementById('qCard').classList.add('shake');
-    document.getElementById('wOverlay').classList.add('flash');setTimeout(()=>document.getElementById('wOverlay').classList.remove('flash'),700);
-    return;
-  }
-  if(finalEl){finalEl.style.borderColor='#4caf50';finalEl.style.background='rgba(76,175,80,.18)';}
-  triggerResult(true,[126]);
-}
-
-// ── CHECK ANSWER ──────────────────────────────────
-function checkAns(){
-  if(answered)return;
-  const q=QS[cur];
-  if(q.pascalMode){checkPascalAns();return;}
-  const userAns=[];
-  for(let i=0;i<q.answers.length;i++){
-    const el=document.getElementById(`ans_${i}`);
-    if(!el||el.value==='')return;
-    userAns.push(parseInt(el.value));
-  }
-  triggerResult(userAns.every((v,i)=>v===q.answers[i]),userAns);
-}
-
-function triggerResult(allOk,userAns){
-  if(answered)return;
-  answered=true;
-  const q=QS[cur];
-  const subBtn=document.getElementById('subBtn');if(subBtn)subBtn.disabled=true;
-  document.querySelectorAll('.ans-input').forEach(e=>e.disabled=true);
-  const pascalBtn=document.getElementById('pascalBtn');if(pascalBtn)pascalBtn.disabled=true;
-  document.querySelectorAll('.p-inp').forEach(e=>e.disabled=true);
-  const card=document.getElementById('qCard'),panel=document.getElementById('resPanel'),nextBtn=document.getElementById('nextBtn');
-  const sprites=card.querySelectorAll('img.pxl');
-  if(allOk){
-    score++;document.getElementById('scoreVal').textContent=score;
-    card.classList.add('c-flash');
-    sprites.forEach(s=>{s.classList.remove('spr-bounce','spr-float');void s.offsetWidth;s.classList.add('spr-spin-in');});
-    spawnPtcls();
-    panel.className='res-panel good show';
-    panel.innerHTML=`
-      <div class="res-inner">
-        <div class="res-spr"><img src="${q.resSpr}" alt="pokemon"/><div class="spr-label" style="color:var(--green)">NICE!</div></div>
-        <div class="res-content">
-          <div class="res-hdr ok">✅ CORRECT! +1 POINT</div>
-          <div style="font-size:18px;color:rgba(255,255,255,.7);margin-bottom:12px;">Want to see the solution?</div>
-          <div class="choice-btns">
-            <button class="cbtn yes" onclick="revealSol()">📖 YES, SHOW ME</button>
-            <button class="cbtn no" onclick="skipSol()">⏭ SKIP</button>
-          </div>
-        </div>
-      </div>`;
-  } else {
-    card.classList.add('shake');
-    sprites.forEach(s=>{s.classList.remove('spr-bounce','spr-float');void s.offsetWidth;s.classList.add('spr-shake');});
-    document.getElementById('wOverlay').classList.add('flash');setTimeout(()=>document.getElementById('wOverlay').classList.remove('flash'),700);
-    panel.className='res-panel wrong show';
-    panel.innerHTML=buildSol(q,true,q.pascalMode?['(see solution below)']:userAns);
-    nextBtn.classList.add('show');
-  }
-}
-
-function buildSol(q,isWrong,userAns){
-  const hdr=isWrong
-    ?`<div class="res-hdr bad">❌ NOT QUITE...</div><div style="font-size:17px;color:rgba(255,120,120,.9);margin-bottom:12px;">Your answer: ${userAns.join(', ')} — Here's the solution:</div>`
-    :`<div class="res-hdr ok" style="margin-bottom:12px;">📖 SOLUTION</div>`;
-  const steps=q.solution.steps.map(s=>`<div class="sol-step">${N(s)}</div>`).join('');
-  return `<div class="res-inner">
-    <div class="res-spr"><img src="${q.resSpr}" alt="pokemon" style="${isWrong?'filter:grayscale(.55)':''}"/><div class="spr-label" style="color:${isWrong?'var(--red)':'var(--green)'};">${isWrong?'Oops!':'Great!'}</div></div>
-    <div class="res-content">${hdr}<div class="sol-block">${steps}<div class="sol-ans">${N(q.solution.final)}</div></div></div>
-  </div>`;
-}
-
-function revealSol(){document.getElementById('resPanel').innerHTML=buildSol(QS[cur],false,[]);document.getElementById('nextBtn').classList.add('show');}
-function skipSol(){document.getElementById('nextBtn').classList.add('show');}
-
-function goNextQ(){
-  cur++;
-  // STORY[0]=intro, STORY[1..9] = before QS[0..8]
-  // After answering QS[cur-1], we now want to show STORY[cur+1] before QS[cur]
-  var storyFor = cur + 1;
-  doWipe(function(){
-    document.getElementById("gameScreen").classList.remove("active");
-    if(storyFor < STORY.length){
-      showStory(storyFor);
-    } else {
-      document.getElementById("gameScreen").classList.add("active");
-      renderQ();
-    }
-  });
-}
-
-// WIN
-const WIN_STORIES=[
-  "You did it, Ash! Against all odds, every puzzle solved, every route survived — you stand as the undisputed Pokémon League Champion! Professor Oak watches from the crowd, tears in his eyes.",
-  "Nine questions. Nine victories. Ash holds the trophy above his head as Pikachu leaps onto his shoulder. Even Gary has to admit — this trainer has what it takes.",
-  "Most of Kanto's challenges are behind you now. Ash may not have gotten every answer right, but the journey taught him more than any classroom ever could.",
-  "The road was tough, Ash. Some answers slipped away. But every trainer falls before they learn to fly. Get back to Professor Oak and study up — Kanto still needs you!"
-];
-
-function showWin(){
-  document.getElementById('progBar').style.width='100%';
-  var wt=document.getElementById('winTitle');if(wt)wt.textContent='🏆 '+playerName.toUpperCase()+' — CHAMPION! 🏆';
-  document.getElementById('finalScore').textContent=score;
-  const msg=score===9?'🌟 PERFECT SCORE — POKÉMON MASTER!':score>=7?'⭐ EXCELLENT WORK, TRAINER!':score>=5?'👍 GOOD JOB! KEEP GOING!':'💪 KEEP TRAINING, ASH!';
-  document.getElementById('winMsg').textContent=msg;
-  const story=score===9?WIN_STORIES[0]:score>=7?WIN_STORIES[1]:score>=5?WIN_STORIES[2]:WIN_STORIES[3];
-  document.getElementById('winStory').textContent=N(story);
-  doWipe(()=>{
-    document.getElementById('gameScreen').classList.remove('active');
-    document.getElementById('winScreen').classList.add('active');
-    spawnPtcls();setTimeout(spawnPtcls,600);setTimeout(spawnPtcls,1200);
-  });
-}
-
-function spawnPtcls(){
-  const em=['⭐','✨','💫','🌟','🎉','🏅','🔥','⚡','❄️'];
-  for(let i=0;i<18;i++){
-    const p=document.createElement('div');
-    p.className='ptcl';p.textContent=em[Math.floor(Math.random()*em.length)];
-    p.style.left=(10+Math.random()*80)+'vw';p.style.top=(20+Math.random()*60)+'vh';
-    p.style.setProperty('--d2',(0.7+Math.random()*1)+'s');
-    p.style.setProperty('--dx',(-100+Math.random()*200)+'px');
-    document.body.appendChild(p);setTimeout(()=>p.remove(),2000);
-  }
-}
-
-// ── KEYBOARD shortcut for story ────────────────────
-document.addEventListener('keydown',function(e){
-  if(e.code==='Space'||e.code==='Enter'){
-    const ss=document.getElementById('storyScreen');
-    if(ss.classList.contains('active')){e.preventDefault();advanceStory();}
-  }
-});
-
-// ── STARS ──────────────────────────────────────────
-const se=document.getElementById('stars');
-for(let i=0;i<140;i++){
-  const s=document.createElement('div');s.className='star';
-  const sz=Math.random()*2.5+.4;
-  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${1.5+Math.random()*3.5}s;`;
-  se.appendChild(s);
-}
-
-// ══════════════════════════════════════════════════════
-//  ADMIN SYSTEM
-// ══════════════════════════════════════════════════════
-var ADMIN_PW_KEY='kq_admin_pw';
-function getAdminPw(){return localStorage.getItem(ADMIN_PW_KEY)||'pikachu2025';}
-
-// ── SECRET TRIGGERS ─────────────────────────────────
-var _pbClicks=0,_pbTimer=null;
-document.querySelector('.pball').addEventListener('click',function(){
-  _pbClicks++;if(_pbTimer)clearTimeout(_pbTimer);
-  if(_pbClicks>=5){_pbClicks=0;openAdminAuth();}
-  else _pbTimer=setTimeout(function(){_pbClicks=0;},800);
-});
-var _kseq='',_kTarget='PROFOAK';
-document.addEventListener('keydown',function(e){
-  _kseq+=e.key.toUpperCase();
-  if(_kseq.length>_kTarget.length)_kseq=_kseq.slice(-_kTarget.length);
-  if(_kseq===_kTarget){_kseq='';openAdminAuth();}
-});
-var _adminUnlocked=false;
-
-// ── AUTH ────────────────────────────────────────────
-function openAdminAuth(){
-  document.getElementById('adminAuth').classList.add('show');
-  document.getElementById('authInp').value='';
-  document.getElementById('authErr').textContent='';
-  setTimeout(function(){document.getElementById('authInp').focus();},100);
-}
-function closeAdminAuth(){document.getElementById('adminAuth').classList.remove('show');}
-function attemptAuth(){
-  var v=document.getElementById('authInp').value;
-  if(v===getAdminPw()){
-    closeAdminAuth();_adminUnlocked=true;
-    document.getElementById('adminLock').classList.add('visible');
-    openAdmin();
-  } else {
-    var err=document.getElementById('authErr');
-    err.textContent='WRONG PASSWORD — TRY AGAIN';
-    document.getElementById('authInp').value='';
-    setTimeout(function(){err.textContent='';},2200);
-  }
-}
-
-// ── PANEL OPEN / CLOSE ────────────────────────────────
-function openAdmin(){
-  admBuildSidebar();
-  admShowTab('overview',document.querySelector('.adm-tab.act'));
-  document.getElementById('admOverviewStats').textContent=
-    'QUESTIONS: '+QS.length+'   |   STORY SCENES: '+STORY.length+'   |   CURRENT SCORE: '+score+'/'+cur;
-  document.getElementById('adminPanel').classList.add('show');
-}
-function closeAdmin(){document.getElementById('adminPanel').classList.remove('show');}
-
-// ── SIDEBAR ───────────────────────────────────────────
-function admBuildSidebar(){
-  var qt=document.getElementById('admQTabs'),st=document.getElementById('admSTabs');
-  qt.innerHTML='';st.innerHTML='';
-  QS.forEach(function(q,i){
-    var b=document.createElement('button');b.className='adm-tab';
-    b.textContent='Q'+(i+1)+' '+q.loc.replace(/^[^\s]+\s/,'').slice(0,13);b.title=q.loc;
-    b.onclick=(function(idx,btn){return function(){admShowTab('q'+idx,btn);admBuildQ(idx);};})(i,b);
-    qt.appendChild(b);
-    if(!document.getElementById('sec-q'+i)){var s=document.createElement('div');s.className='adm-sec';s.id='sec-q'+i;document.getElementById('admContent').appendChild(s);}
-  });
-  STORY.forEach(function(sd,i){
-    var b=document.createElement('button');b.className='adm-tab';
-    b.textContent='S'+(i+1)+' '+sd.locName.slice(0,13);b.title=sd.locName;
-    b.onclick=(function(idx,btn){return function(){admShowTab('s'+idx,btn);admBuildS(idx);};})(i,b);
-    st.appendChild(b);
-    if(!document.getElementById('sec-s'+i)){var s=document.createElement('div');s.className='adm-sec';s.id='sec-s'+i;document.getElementById('admContent').appendChild(s);}
-  });
-}
-
-function admShowTab(id,btn){
-  document.querySelectorAll('.adm-sec').forEach(function(s){s.classList.remove('act');});
-  document.querySelectorAll('.adm-tab').forEach(function(b){b.classList.remove('act');});
-  var sec=document.getElementById('sec-'+id);if(sec)sec.classList.add('act');
-  if(btn)btn.classList.add('act');
-}
-
-// ── QUESTION EDITOR ───────────────────────────────────
-function admBuildQ(i){
-  var q=QS[i],sec=document.getElementById('sec-q'+i);
-  var bHTML=q.bullets.map(function(b,bi){
-    return '<div class="adm-bullet-row"><input type="text" value="'+escH(b)+'" id="admq'+i+'_b'+bi+'"/>'
-      +'<button class="adm-bullet-del" onclick="admDelBullet('+i+','+bi+')">✕</button></div>';
-  }).join('');
-  sec.innerHTML='<h2>Q'+(i+1)+' — '+escH(q.loc)+'</h2>'
-    +'<div class="adm-badge">'+escH(q.type)+'</div>'
-    +'<div class="adm-row">'
-      +'<div class="adm-field"><label>LOCATION</label><input id="admq'+i+'_loc" value="'+escH(q.loc)+'"/></div>'
-      +'<div class="adm-field"><label>TYPE BADGE</label><input id="admq'+i+'_type" value="'+escH(q.type)+'"/></div>'
-    +'</div>'
-    +'<div class="adm-field"><label>STORY STRIP</label><input id="admq'+i+'_story" value="'+escH(q.story||'')+'"/></div>'
-    +'<div class="adm-field"><label>QUESTION TEXT</label><textarea id="admq'+i+'_q">'+escH(q.q)+'</textarea></div>'
-    +'<div class="adm-field"><label>BULLET POINTS</label>'
-      +'<div class="adm-bullets-wrap" id="admq'+i+'_bullets">'+bHTML+'</div>'
-      +'<button class="adm-add-bullet" onclick="admAddBullet('+i+')">+ ADD BULLET</button></div>'
-    +'<div class="adm-field"><label>ASK / PROMPT (yellow text)</label><input id="admq'+i+'_ask" value="'+escH(q.ask)+'"/></div>'
-    +'<div class="adm-row">'
-      +'<div class="adm-field"><label>CORRECT ANSWERS (comma-separated)</label><input id="admq'+i+'_answers" value="'+q.answers.join(', ')+'"/></div>'
-      +'<div class="adm-field"><label>ANSWER LABELS (one per line, for multi-part)</label><textarea id="admq'+i+'_labels" style="min-height:48px;">'+(q.labels?q.labels.join('\n'):'')+'</textarea></div>'
-    +'</div>'
-    +'<hr class="adm-divider"/>'
-    +'<div class="adm-field"><label>SOLUTION STEPS (one per line)</label><textarea id="admq'+i+'_steps" style="min-height:90px;">'+escH(q.solution.steps.join('\n'))+'</textarea></div>'
-    +'<div class="adm-field"><label>FINAL ANSWER LINE</label><input id="admq'+i+'_final" value="'+escH(q.solution.final)+'"/></div>';
-}
-function admDelBullet(qi,bi){QS[qi].bullets.splice(bi,1);admBuildQ(qi);}
-function admAddBullet(qi){QS[qi].bullets.push('New bullet point');admBuildQ(qi);}
-
-// ── STORY EDITOR ──────────────────────────────────────
-function admBuildS(i){
-  var sd=STORY[i],sec=document.getElementById('sec-s'+i);
-  var slidesHTML=sd.slides.map(function(sl,si){
-    return '<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:14px;margin-bottom:12px;">'
-      +'<div class="adm-field"><label>SLIDE '+(si+1)+' — CHARACTER NAME</label><input id="adms'+i+'_'+si+'_name" value="'+escH(sl.charName)+'"/></div>'
-      +'<div class="adm-field"><label>DIALOGUE TEXT (use \\n for new line)</label><textarea id="adms'+i+'_'+si+'_lines">'+escH(sl.lines)+'</textarea></div>'
-      +'<div class="adm-field"><label>SCENE SPRITE IDs (Pokédex numbers, comma-separated)</label><input id="adms'+i+'_'+si+'_spr" value="'+(sl.sceneSpriteIds?sl.sceneSpriteIds.join(', '):'')+'"/></div>'
-    +'</div>';
-  }).join('');
-  sec.innerHTML='<h2>SCENE '+(i+1)+' — '+escH(sd.locName)+'</h2>'
-    +'<div class="adm-row">'
-      +'<div class="adm-field"><label>LOCATION NAME</label><input id="adms'+i+'_loc" value="'+escH(sd.locName)+'"/></div>'
-      +'<div class="adm-field"><label>SUBTITLE</label><input id="adms'+i+'_sub" value="'+escH(sd.locSub)+'"/></div>'
-    +'</div>'
-    +'<div class="adm-field"><label>LOCATION ICON (emoji)</label><input id="adms'+i+'_icon" value="'+escH(sd.locIcon)+'"/></div>'
-    +'<hr class="adm-divider"/>'
-    +slidesHTML;
-}
-
-// ── SAVE ALL ──────────────────────────────────────────
-function admSave(){
-  var get=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
-  QS.forEach(function(q,i){
-    var loc=get('admq'+i+'_loc');if(loc)q.loc=loc;
-    var type=get('admq'+i+'_type');if(type)q.type=type;
-    q.story=get('admq'+i+'_story');
-    var qv=get('admq'+i+'_q');if(qv)q.q=qv;
-    var ask=get('admq'+i+'_ask');if(ask)q.ask=ask;
-    var nb=[];q.bullets.forEach(function(_,bi){var el=document.getElementById('admq'+i+'_b'+bi);if(el&&el.value.trim())nb.push(el.value.trim());});q.bullets=nb;
-    var ar=get('admq'+i+'_answers');if(ar)q.answers=ar.split(',').map(function(a){return parseInt(a.trim());}).filter(function(n){return !isNaN(n);});
-    var lr=get('admq'+i+'_labels');q.labels=lr?lr.split('\n').map(function(l){return l.trim();}).filter(Boolean):null;if(q.labels&&!q.labels.length)q.labels=null;
-    var sr=get('admq'+i+'_steps');if(sr)q.solution.steps=sr.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-    var fi=get('admq'+i+'_final');if(fi)q.solution.final=fi;
-  });
-  STORY.forEach(function(sd,i){
-    var loc=get('adms'+i+'_loc');if(loc)sd.locName=loc;
-    var sub=get('adms'+i+'_sub');if(sub)sd.locSub=sub;
-    var ico=get('adms'+i+'_icon');if(ico)sd.locIcon=ico;
-    sd.slides.forEach(function(sl,si){
-      var n=get('adms'+i+'_'+si+'_name');if(n)sl.charName=n;
-      var l=get('adms'+i+'_'+si+'_lines');if(l)sl.lines=l;
-      var sp=get('adms'+i+'_'+si+'_spr');sl.sceneSpriteIds=sp?sp.split(',').map(function(x){return parseInt(x.trim());}).filter(function(n){return !isNaN(n);}):null;if(sl.sceneSpriteIds&&!sl.sceneSpriteIds.length)sl.sceneSpriteIds=null;
-    });
-  });
-  showAdmToast('CHANGES SAVED — RESTART TO APPLY');
-}
-
-function showAdmToast(msg){
-  var t=document.getElementById('admToast');t.textContent=msg;t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2600);
-}
-
-// ── CHANGE PASSWORD ───────────────────────────────────
-function changePassword(){
-  var cur=document.getElementById('pwCurrent').value;
-  var nw=document.getElementById('pwNew').value;
-  var conf=document.getElementById('pwConfirm').value;
-  var err=document.getElementById('pwErr');
-  if(cur!==getAdminPw()){err.textContent='CURRENT PASSWORD IS WRONG';return;}
-  if(nw.length<4){err.textContent='PASSWORD MUST BE 4+ CHARS';return;}
-  if(nw!==conf){err.textContent='PASSWORDS DO NOT MATCH';return;}
-  localStorage.setItem(ADMIN_PW_KEY,nw);
-  ['pwCurrent','pwNew','pwConfirm'].forEach(function(id){document.getElementById(id).value='';});
-  err.textContent='';showAdmToast('PASSWORD UPDATED!');
-}
-
-function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-</script>
-
-<!-- ══════════ ADMIN LOCK BUTTON (hidden) ══════════ -->
+<!-- ADMIN AUTH -->
 <button id="adminLock" onclick="openAdminAuth()" title=""></button>
-<div class="adm-toast" id="admToast">✅ CHANGES SAVED!</div>
-
-<!-- ══════════ AUTH MODAL ══════════ -->
+<div class="adm-toast" id="admToast"></div>
 <div id="adminAuth">
   <div class="auth-box">
     <h2>🔐 ADMIN ACCESS</h2>
@@ -1352,12 +396,12 @@ function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
   </div>
 </div>
 
-<!-- ══════════ ADMIN PANEL ══════════ -->
+<!-- ADMIN PANEL -->
 <div id="adminPanel">
   <div class="adm-top">
     <h1>🛠 KANTO QUEST — EDITOR</h1>
     <div class="adm-top-btns">
-      <button class="adm-save-btn" onclick="admSave()">💾 SAVE CHANGES</button>
+      <button class="adm-save-btn"  onclick="admSave()">💾 SAVE</button>
       <button class="adm-close-btn" onclick="closeAdmin()">✕ CLOSE</button>
     </div>
   </div>
@@ -1365,36 +409,870 @@ function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').rep
     <div class="adm-sidebar">
       <div class="adm-sidebar-title">SECTIONS</div>
       <button class="adm-tab act" onclick="admShowTab('overview',this)">📋 Overview</button>
-      <button class="adm-tab" onclick="admShowTab('password',this)">🔑 Password</button>
+      <button class="adm-tab"     onclick="admShowTab('password',this)">🔑 Password</button>
       <div class="adm-sidebar-title" style="margin-top:10px;">QUESTIONS</div>
       <div id="admQTabs"></div>
       <div class="adm-sidebar-title" style="margin-top:10px;">STORY</div>
       <div id="admSTabs"></div>
     </div>
     <div class="adm-content" id="admContent">
-      <!-- Overview -->
       <div class="adm-sec act" id="sec-overview">
         <h2>📋 OVERVIEW</h2>
-        <p class="adm-info">Welcome to the Kanto Quest editor. Use the sidebar to navigate between questions and story scenes. Changes apply immediately after saving.</p>
-        <p class="adm-info">🔐 <strong>Access:</strong> Secret trigger is clicking the Pokéball on the title screen 5 times quickly, OR typing <span class="adm-hint-chip">PROF</span><span class="adm-hint-chip">OAK</span> on any screen.</p>
-        <p class="adm-info">📝 <strong>Tips:</strong> For bullets, each line is a separate bullet point. Answers must be numbers. Use | to separate multiple correct answers.</p>
+        <p class="adm-info">Welcome to the Kanto Quest editor. Use the sidebar to edit questions and story scenes. Save applies changes live in memory.</p>
+        <p class="adm-info">🔐 <strong>Secret triggers:</strong> Click the Pokéball 5× on the title screen, OR type <span class="adm-hint-chip">PROFOAK</span> on any screen.</p>
         <hr class="adm-divider"/>
-        <p class="adm-info" id="admOverviewStats"></p>
+        <p class="adm-info" id="admStats"></p>
       </div>
-      <!-- Password -->
       <div class="adm-sec" id="sec-password">
         <h2>🔑 CHANGE PASSWORD</h2>
-        <p class="adm-info">Change the admin password. You'll need the new password next time you log in.</p>
         <div class="adm-field"><label>CURRENT PASSWORD</label><input type="password" id="pwCurrent" placeholder="current password"/></div>
         <div class="adm-field"><label>NEW PASSWORD</label><input type="password" id="pwNew" placeholder="new password (min 4 chars)"/></div>
-        <div class="adm-field"><label>CONFIRM NEW PASSWORD</label><input type="password" id="pwConfirm" placeholder="confirm new password"/></div>
+        <div class="adm-field"><label>CONFIRM</label><input type="password" id="pwConfirm" placeholder="confirm new password"/></div>
         <div class="auth-err" id="pwErr" style="text-align:left;margin-bottom:10px;"></div>
-        <button class="adm-save-btn" style="width:auto;padding:10px 20px;" onclick="changePassword()">UPDATE PASSWORD ▶</button>
+        <button class="adm-save-btn" style="width:auto;padding:10px 20px;" onclick="changePassword()">UPDATE ▶</button>
       </div>
-      <!-- Q sections filled dynamically -->
-      <!-- S sections filled dynamically -->
     </div>
   </div>
 </div>
+
+<script>
+'use strict';
+
+// ── CONSTANTS ────────────────────────────────────────
+const GIF = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
+const OAK_SPR   = 'https://play.pokemonshowdown.com/sprites/trainers/oak.png';
+const PLAYER_SPR = 'https://play.pokemonshowdown.com/sprites/trainers/red.png';
+const GARY_SPR   = 'https://play.pokemonshowdown.com/sprites/trainers/gary.png';
+
+const AURAS = [
+  'radial-gradient(ellipse at 30% 60%,rgba(34,139,34,.18) 0%,transparent 55%),radial-gradient(ellipse at 70% 30%,rgba(59,76,202,.12) 0%,transparent 50%)',
+  'radial-gradient(ellipse at 50% 50%,rgba(80,60,120,.2)  0%,transparent 60%)',
+  'radial-gradient(ellipse at 40% 70%,rgba(0,80,160,.15)  0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% 50%,rgba(80,0,80,.22)   0%,transparent 60%)',
+  'radial-gradient(ellipse at 60% 40%,rgba(160,120,0,.16) 0%,transparent 50%)',
+  'radial-gradient(ellipse at 50% 50%,rgba(200,180,0,.15) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 40% 60%,rgba(0,120,200,.18) 0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% 50%,rgba(180,50,0,.18)  0%,transparent 55%)',
+  'radial-gradient(ellipse at 50% 50%,rgba(160,0,160,.2)  0%,transparent 60%)',
+];
+
+// ── STATE ────────────────────────────────────────────
+let playerName = 'Ash';
+let cur = 0, score = 0, answered = false;
+let storyIdx = 0, slideIdx = 0;
+let typeTimer = null, typeDone = false;
+
+// ── NAME SUBSTITUTION ────────────────────────────────
+function N(s) {
+  if (!s) return s;
+  return s
+    .replace(/\bAsh's\b/g, playerName + "'s")
+    .replace(/\bAsh\b/g,   playerName)
+    .replace(/\bASH\b/g,   playerName.toUpperCase());
+}
+
+// ── SVG DIAGRAMS ─────────────────────────────────────
+function buildTreeSVG() {
+  const PS = "font-family=\"'Press Start 2P',monospace\"";
+  const VT = "font-family=\"'VT323',monospace\"";
+  let s = `<svg class="diag-svg" viewBox="0 0 560 316" width="100%">`;
+  s += `<text x="280" y="20" text-anchor="middle" ${PS} font-size="8" fill="#ffde00">POWER PLANT — SECURITY TREE DIAGRAM</text>`;
+  s += `<text x="20" y="63"  ${VT} font-size="13" fill="rgba(104,144,240,.7)">START</text>`;
+  s += `<text x="20" y="161" ${VT} font-size="13" fill="rgba(104,144,240,.7)">BTN</text>`;
+  s += `<text x="20" y="258" ${VT} font-size="13" fill="rgba(104,144,240,.7)">SWITCH</text>`;
+  // root → button lines
+  [97,280,463].forEach(x => s += `<line x1="280" y1="86" x2="${x}" y2="129" stroke="rgba(104,144,240,.45)" stroke-width="2" stroke-dasharray="6,3"/>`);
+  // button → leaf lines
+  [[97,52,144,'#e3350d'],[280,244,316,'#6890f0'],[463,416,508,'#ffde00']].forEach(([bx,l,r,c]) => {
+    s += `<line x1="${bx}" y1="181" x2="${l}" y2="236" stroke="${c}" stroke-width="2"/>`;
+    s += `<line x1="${bx}" y1="181" x2="${r}" y2="236" stroke="${c}" stroke-width="2"/>`;
+  });
+  // root node
+  s += `<circle cx="280" cy="62" r="24" fill="#07071e" stroke="#6890f0" stroke-width="2.5"/>`;
+  s += `<text x="280" y="57" text-anchor="middle" ${PS} font-size="6" fill="#6890f0">PRESS</text>`;
+  s += `<text x="280" y="70" text-anchor="middle" ${PS} font-size="6" fill="#6890f0">BUTTON</text>`;
+  // button nodes
+  [[97,'#e3350d','#200000','R','RED'],[280,'#6890f0','#000418','B','BLUE'],[463,'#ffde00','#181200','Y','YLW']].forEach(([cx,c,bg,l,n]) => {
+    s += `<circle cx="${cx}" cy="155" r="24" fill="${bg}" stroke="${c}" stroke-width="2.5"/>`;
+    s += `<text x="${cx}" y="150" text-anchor="middle" ${PS} font-size="9" fill="${c}">${l}</text>`;
+    s += `<text x="${cx}" y="164" text-anchor="middle" ${VT} font-size="14" fill="${c}">${n}</text>`;
+  });
+  // leaf nodes
+  [[52,'#e3350d','#140000','UP ↑'],[144,'#e3350d','#140000','DN ↓'],[244,'#6890f0','#000416','UP ↑'],[316,'#6890f0','#000416','DN ↓'],[416,'#ffde00','#141000','UP ↑'],[508,'#ffde00','#141000','DN ↓']].forEach(([cx,c,bg,t]) => {
+    s += `<rect x="${cx-30}" y="236" width="60" height="28" rx="3" fill="${bg}" stroke="${c}" stroke-width="1.5"/>`;
+    s += `<text x="${cx}" y="256" text-anchor="middle" ${VT} font-size="17" fill="${c}">${t}</text>`;
+  });
+  s += `<rect x="185" y="292" width="190" height="14" rx="3" fill="rgba(104,144,240,.1)" stroke="rgba(104,144,240,.28)" stroke-width="1"/>`;
+  s += `<text x="280" y="303" text-anchor="middle" ${PS} font-size="6" fill="rgba(104,144,240,.6)">COUNT ALL PATHS →</text>`;
+  return s + '</svg>';
+}
+
+function buildVennSVG() {
+  const PS = "font-family=\"'Press Start 2P',monospace\"";
+  const VT = "font-family=\"'VT323',monospace\"";
+  let s = `<svg class="diag-svg" viewBox="0 0 500 270" width="100%">`;
+  s += `<text x="250" y="20" text-anchor="middle" ${PS} font-size="8" fill="#ffde00">VENN DIAGRAM — TRAINER'S POKÉMON (total: 30)</text>`;
+  s += `<rect x="12" y="28" width="476" height="228" rx="6" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.5" stroke-dasharray="7,5"/>`;
+  s += `<circle cx="185" cy="155" r="102" fill="rgba(227,53,13,.13)" stroke="#e3350d" stroke-width="2.5"/>`;
+  s += `<circle cx="315" cy="155" r="102" fill="rgba(148,0,211,.13)" stroke="#9b20e0" stroke-width="2.5"/>`;
+  s += `<text x="143" y="52" text-anchor="middle" ${PS} font-size="7" fill="#ff5533">🔥 FIRE</text>`;
+  s += `<text x="143" y="64" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,100,60,.75)">(17 total)</text>`;
+  s += `<text x="357" y="52" text-anchor="middle" ${PS} font-size="7" fill="#c060ff">🔮 PSYCHIC</text>`;
+  s += `<text x="357" y="64" text-anchor="middle" ${PS} font-size="6" fill="rgba(190,100,255,.75)">(14 total)</text>`;
+  s += `<text x="120" y="154" text-anchor="middle" ${PS} font-size="7" fill="rgba(255,100,60,.7)">FIRE</text>`;
+  s += `<text x="120" y="168" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,100,60,.5)">ONLY</text>`;
+  s += `<text x="250" y="150" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,220,0,.8)">BOTH</text>`;
+  s += `<text x="250" y="162" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,220,0,.55)">(6 known)</text>`;
+  s += `<text x="380" y="154" text-anchor="middle" ${PS} font-size="7" fill="rgba(190,100,255,.7)">PSYCHIC</text>`;
+  s += `<text x="380" y="168" text-anchor="middle" ${PS} font-size="6" fill="rgba(190,100,255,.5)">ONLY</text>`;
+  s += `<circle cx="464" cy="210" r="22" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+  s += `<text x="464" y="206" text-anchor="middle" ${VT} font-size="14" fill="rgba(255,255,255,.35)">?</text>`;
+  s += `<text x="464" y="224" text-anchor="middle" ${PS} font-size="5"  fill="rgba(255,255,255,.3)">Neither</text>`;
+  s += `<text x="40"  y="248" ${PS} font-size="6" fill="rgba(255,255,255,.3)">Total = 30</text>`;
+  return s + '</svg>';
+}
+
+// ── STORY DATA ───────────────────────────────────────
+const STORY = [
+  {
+    locIcon:'🌿', locName:'PALLET TOWN', locSub:'Where every legend begins...', aura:'radial-gradient(ellipse at 50% 50%,rgba(59,76,202,.18) 0%,transparent 60%)',
+    slides:[
+      {portrait:OAK_SPR,    charName:'PROF. OAK', lines:"Hello there, Ash!\nWelcome to the world of Pokémon.",                                                                                                   spr:[1,4,7]},
+      {portrait:OAK_SPR,    charName:'PROF. OAK', lines:"My name is Professor Oak.\nPeople call me the Pokémon Professor.",                                                                                        spr:[1,4,7]},
+      {portrait:OAK_SPR,    charName:'PROF. OAK', lines:"Your very own Pokémon legend is about to unfold! You will travel all of Kanto and challenge the Pokémon League.",                                         spr:null},
+      {portrait:OAK_SPR,    charName:'PROF. OAK', lines:"But there's a catch, Ash...",                                                                                                                             spr:null},
+      {portrait:PLAYER_SPR, charName:'ASH',        lines:"A catch?! I'm ready for anything, Professor! Pikachu and I can handle it!",                                                                               spr:null},
+      {portrait:OAK_SPR,    charName:'PROF. OAK', lines:"Every challenge on your journey will require COUNTING SKILLS. Solve each one to move forward.\nGood luck, Ash — your adventure begins now!",              spr:null},
+    ]
+  },
+  {
+    locIcon:'🌲', locName:'VIRIDIAN FOREST', locSub:'Bug Pokémon lurk in the tall grass...', aura:AURAS[0],
+    slides:[
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"We're almost at Viridian Forest! But first — I need to pack the right supplies at the Poké Mart.", spr:[1,4,7]},
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"There are so many combinations of items to choose from. I better figure out exactly how many options I have!", spr:null},
+    ]
+  },
+  {
+    locIcon:'🌑', locName:'MT. MOON', locSub:'Team Rocket is up to no good...', aura:AURAS[1],
+    slides:[
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"We made it through Viridian Forest! Now deep inside Mt. Moon, Team Rocket is stealing fossils!", spr:[52,41]},
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"I stopped them! A grateful scientist says I can take one fossil as a reward — but which table should I pick from?", spr:[35]},
+    ]
+  },
+  {
+    locIcon:'🚢', locName:'SS ANNE', locSub:'A grand ship docked at Vermilion City...', aura:AURAS[2],
+    slides:[
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"Wow — the SS Anne is HUGE! The captain is throwing a grand Pokémon parade on deck.", spr:[54,52,25,39,74,63,50]},
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"Seven different Pokémon need to march in a single-file line. How many different orders are possible? This is going to take some counting...", spr:null},
+    ]
+  },
+  {
+    locIcon:'👻', locName:'LAVENDER TOWN', locSub:'A haunting melody fills the air...', aura:AURAS[3],
+    slides:[
+      {portrait:GIF(93),    charName:'HAUNTER', lines:"Heeeheeehee... Welcome to Pokémon Tower, little trainer. The spirits of the departed rest here...", spr:[93,92,200]},
+      {portrait:PLAYER_SPR, charName:'ASH',     lines:"A-a caretaker is asking me to arrange memorial candles on the altar. The ORDER matters — each arrangement sends a different message to the spirits!", spr:null},
+    ]
+  },
+  {
+    locIcon:'🎰', locName:'CELADON GAME CORNER', locSub:'Neon lights and scrambled prizes...', aura:AURAS[4],
+    slides:[
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"The Celadon Game Corner! I can't gamble, but there's this cool prize machine that scrambles letter tiles.", spr:[19]},
+      {portrait:PLAYER_SPR, charName:'ASH', lines:"The tiles spell out a Pokémon's name — R, A, T, T, A, T, A — but how many different ways can those 7 letters be arranged?", spr:null},
+    ]
+  },
+  {
+    locIcon:'⚡', locName:'POWER PLANT', locSub:'Zapdos nests somewhere inside...', aura:AURAS[5],
+    slides:[
+      {portrait:GIF(145),   charName:'ZAPDOS', lines:"ZAP! ...bzzt... This is MY Power Plant. No one enters without getting past the security system first.", spr:[145]},
+      {portrait:PLAYER_SPR, charName:'ASH',    lines:"There are two checkpoints — one button and one switch. I need to map out every possible combination before I can get through!", spr:null},
+    ]
+  },
+  {
+    locIcon:'🧊', locName:'SEAFOAM ISLANDS', locSub:'Articuno glides through frozen caverns...', aura:AURAS[6],
+    slides:[
+      {portrait:GIF(144),   charName:'ARTICUNO', lines:"...These frozen halls belong to me. But a researcher left behind a bag of TMs. You may take some, young trainer.", spr:[144]},
+      {portrait:PLAYER_SPR, charName:'ASH',      lines:"There are 8 Ice-type TMs in the bag and I can only carry 3. The ORDER doesn't matter — how many groups can I choose?", spr:null},
+    ]
+  },
+  {
+    locIcon:'🏟', locName:'INDIGO PLATEAU', locSub:'The Pokémon League awaits!', aura:AURAS[7],
+    slides:[
+      {portrait:GARY_SPR,   charName:'GARY OAK', lines:"Well, well, well... if it isn't loser Ash. You actually made it? ...Smell ya later!", spr:[132,6]},
+      {portrait:GARY_SPR,   charName:'GARY OAK', lines:"Wait. Before you enter, PROVE you deserve to be here. I have 9 Pokémon — I'll only bring 4 for the warm-up. How many teams can I make?", spr:null},
+      {portrait:PLAYER_SPR, charName:'ASH',      lines:"Pascal's Triangle... Professor Oak taught me this! I can work it out row by row. Let's go!", spr:null},
+    ]
+  },
+  {
+    locIcon:'🔥', locName:'CINNABAR ISLAND LAB', locSub:'Where Mewtwo was born...', aura:AURAS[8],
+    slides:[
+      {portrait:GIF(150),   charName:'MEWTWO', lines:"...So. You come to this lab after conquering the League. This is where I was created. I hold no love for humans.", spr:[150]},
+      {portrait:GIF(150),   charName:'MEWTWO', lines:"But even I must acknowledge — the scientists here have been studying your Pokémon. They seek to understand what types they know. Can you help?", spr:null},
+      {portrait:PLAYER_SPR, charName:'ASH',    lines:"Of course! 30 of my Pokémon, Fire-types and Psychic-types. I'll use a Venn Diagram to sort it out!", spr:null},
+    ]
+  },
+];
+
+// ── QUESTION DATA ────────────────────────────────────
+const QS = [
+  {
+    loc:'🌲 Viridian Forest', type:'Fundamental Counting Principle',
+    story:'Before entering the forest, Ash stocks up at the Poké Mart.',
+    q:'He can choose:', bullets:['1 of 3 starters (Bulbasaur, Charmander, or Squirtle)','1 of 4 Potions (Potion, Super Potion, Hyper Potion, Max Potion)','1 of 3 Repel sprays (Repel, Super Repel, Max Repel)'],
+    ask:'How many different combinations can Ash pack?',
+    answers:[36], labels:null,
+    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(1)}" alt="Bulbasaur"/><img class="pxl" src="${GIF(4)}" alt="Charmander"/><img class="pxl" src="${GIF(7)}" alt="Squirtle"/></div><div class="spr-label">Choose wisely!</div>`,
+    resSpr: GIF(25),
+    solution:{ steps:['Multiply choices at each step — Fundamental Counting Principle.','Starters: 3  ×  Potions: 4  ×  Repels: 3','3 × 4 × 3 = 36'], final:'Answer: 36 combinations' }
+  },
+  {
+    loc:'🌑 Mt. Moon', type:'Additive Counting Principle',
+    story:'A grateful scientist offers Ash one fossil from one of three tables.',
+    q:'The tables contain:', bullets:['Table A: 5 Dome Fossils','Table B: 3 Helix Fossils','Table C: 4 Old Amber stones'],
+    ask:'Ash picks from ONE table only. How many total choices does he have?',
+    answers:[12], labels:null,
+    cardSprite:`<img class="pxl spr-float lg" src="${GIF(35)}" alt="Clefairy"/><div class="spr-label">Clefairy</div>`,
+    resSpr: GIF(35),
+    solution:{ steps:['Ash picks from ONE table — use the Additive Counting Principle: add.','Table A: 5  |  Table B: 3  |  Table C: 4','5 + 3 + 4 = 12'], final:'Answer: 12 total choices' }
+  },
+  {
+    loc:'🚢 SS Anne', type:'Factorials',
+    story:'The captain lines up 7 Pokémon for the grand parade on deck.',
+    q:'Seven different Pokémon must march in a single-file line.', bullets:[],
+    ask:'In how many different orders can all 7 Pokémon march?',
+    answers:[5040], labels:null,
+    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(54)}" alt="Psyduck"/><img class="pxl" src="${GIF(52)}" alt="Meowth"/><img class="pxl" src="${GIF(25)}" alt="Pikachu"/><img class="pxl" src="${GIF(39)}" alt="Jigglypuff"/><img class="pxl" src="${GIF(74)}" alt="Geodude"/><img class="pxl" src="${GIF(63)}" alt="Abra"/><img class="pxl" src="${GIF(50)}" alt="Diglett"/></div><div class="spr-label">7 Pokémon march!</div>`,
+    resSpr: GIF(25),
+    solution:{ steps:['All 7 Pokémon in a line — full factorial.','7! = 7 × 6 × 5 × 4 × 3 × 2 × 1','= 5040'], final:'Answer: 5,040 arrangements' }
+  },
+  {
+    loc:'👻 Lavender Town', type:'Permutations P(n,r)',
+    story:'A caretaker needs Ash to arrange memorial candles — the ORDER matters.',
+    q:'3 candles are chosen from 8 different coloured candles. Each order sends a different message to the spirits.', bullets:[],
+    ask:'How many different ordered arrangements of 3 candles from 8 are possible?',
+    answers:[336], labels:null,
+    cardSprite:`<img class="pxl spr-float lg" src="${GIF(93)}" alt="Haunter"/><div class="spr-label">Haunter</div>`,
+    resSpr: GIF(94),
+    solution:{ steps:['Use the Permutation formula: P(n,r) = n! / (n−r)!','P(8,3) = 8! / 5!','= 8 × 7 × 6 = 336'], final:'Answer: 336 ordered arrangements' }
+  },
+  {
+    loc:'🎰 Celadon Game Corner', type:'Permutations with Identical Elements',
+    story:"The prize machine scrambles letters to spell a Pokémon's name.",
+    q:'The tiles shown are:', bullets:["R, A, T, T, A, T, A  —  7 letters:  3 T's,  3 A's,  1 R"],
+    ask:'How many distinct arrangements can the machine display?',
+    answers:[140], labels:null,
+    cardSprite:`<img class="pxl spr-bounce lg" src="${GIF(19)}" alt="Rattata"/><div class="spr-label">RATTATA!</div>`,
+    resSpr: GIF(19),
+    solution:{ steps:['Divide by the factorial of each repeated element.','Formula: n! / (n₁! × n₂! × ...)','= 7! / (3! × 3! × 1!)','= 5040 / 36'], final:'Answer: 140 distinct arrangements' }
+  },
+  {
+    loc:'⚡ Power Plant', type:'Tree Diagrams',
+    story:"Zapdos's security system blocks the way. Two checkpoints must be passed.",
+    q:'The two checkpoints are:', bullets:['Checkpoint 1: Press one of 3 buttons — Red, Blue, or Yellow','Checkpoint 2: Flip one of 2 switches — Up or Down'],
+    ask:'Using the tree diagram above, how many total combinations are there?',
+    answers:[6], labels:null, diagramHTML: buildTreeSVG(),
+    cardSprite:`<img class="pxl spr-float lg" src="${GIF(145)}" alt="Zapdos"/><div class="spr-label">Zapdos</div>`,
+    resSpr: GIF(145),
+    solution:{ steps:['Each button branches into 2 switch options — multiply.','Red→Up, Red→Down | Blue→Up, Blue→Down | Yellow→Up, Yellow→Down','Total = 3 × 2 = 6'], final:'Answer: 6 combinations' }
+  },
+  {
+    loc:'🧊 Seafoam Islands', type:'Combinations C(n,r)',
+    story:"Articuno watches as Ash rummages through the researcher's bag of TMs.",
+    q:"The bag holds 8 different Ice-type TMs. Ash can carry 3 — and the order he picks them doesn't matter.", bullets:[],
+    ask:'How many different groups of 3 TMs can Ash choose?',
+    answers:[56], labels:null,
+    cardSprite:`<img class="pxl spr-float lg" src="${GIF(144)}" alt="Articuno"/><div class="spr-label">Articuno</div>`,
+    resSpr: GIF(144),
+    solution:{ steps:['Order does not matter — use Combinations: C(n,r) = n! / (r! × (n−r)!)','C(8,3) = 8! / (3! × 5!)','= (8 × 7 × 6) / (3 × 2 × 1) = 336 / 6'], final:'Answer: 56 different groups' }
+  },
+  {
+    loc:'🏟 Indigo Plateau', type:"Pascal's Triangle",
+    story:"Gary challenges Ash: fill Pascal's Triangle to find C(9,4).",
+    q:"Build Pascal's Triangle row by row. Each number is the sum of the two numbers above it. The edges are always 1.", bullets:[],
+    ask:"Fill every cell — when all boxes turn 🟩 green, enter your C(9,4) answer below!",
+    answers:[126], labels:null, pascalMode:true,
+    cardSprite:`<div class="spr-row"><img class="pxl" src="${GIF(6)}" alt="Charizard"/><img class="pxl" src="${GIF(65)}" alt="Alakazam"/><img class="pxl" src="${GIF(68)}" alt="Machamp"/><img class="pxl" src="${GIF(112)}" alt="Rhydon"/></div><div class="spr-label">Your rival awaits!</div>`,
+    resSpr: GIF(6),
+    solution:{ steps:["Pascal's Triangle, row 9 (starting from row 0):","Row 9: 1, 9, 36, 84, 126, 126, 84, 36, 9, 1","C(9,4) = the 5th value in row 9 (index 4).","Verify: 9! / (4! × 5!) = 3024 / 24 = 126"], final:'Answer: C(9,4) = 126 different groups' }
+  },
+  {
+    loc:'🔥 Cinnabar Island Lab', type:'Venn Diagrams',
+    story:"Scientists at the Cinnabar Lab study the types of moves in Ash's Pokémon.",
+    q:"Researchers examine 30 of Ash's Pokémon and find:", bullets:['17 know at least one Fire-type move','14 know at least one Psychic-type move','6 know BOTH a Fire-type and a Psychic-type move'],
+    ask:'Use the Venn Diagram above to answer both parts:',
+    answers:[25,5], labels:['(a) Know at least one move type?','(b) Know neither?'], diagramHTML: buildVennSVG(),
+    cardSprite:`<img class="pxl spr-float lg" src="${GIF(150)}" alt="Mewtwo"/><div class="spr-label">Mewtwo</div>`,
+    resSpr: GIF(150),
+    solution:{ steps:['Use Inclusion-Exclusion: A ∪ B = |A| + |B| − |A ∩ B|','(a): 17 + 14 − 6 = 25 know at least one move type','(b): 30 − 25 = 5 know neither'], final:'Answers: (a) 25 Pokémon   (b) 5 Pokémon' }
+  },
+];
+
+// ── TITLE & NAME ─────────────────────────────────────
+function titleStart() {
+  document.getElementById('titleScreen').classList.add('out');
+  setTimeout(() => {
+    document.getElementById('titleScreen').style.display = 'none';
+    document.getElementById('nameScreen').classList.add('active');
+    setTimeout(() => document.getElementById('nameInp').focus(), 200);
+  }, 800);
+}
+
+function confirmName() {
+  const raw = document.getElementById('nameInp').value.trim();
+  if (!raw) { document.getElementById('nameInp').focus(); return; }
+  playerName = raw.replace(/\b\w/g, c => c.toUpperCase());
+  document.getElementById('nameScreen').classList.remove('active');
+  document.getElementById('hudTrainerName').textContent = playerName.toUpperCase();
+  showStory(0);
+}
+
+// ── TYPEWRITER ───────────────────────────────────────
+function typeWrite(text, el, onDone) {
+  if (typeTimer) clearInterval(typeTimer);
+  typeDone = false;
+  el.innerHTML = '';
+  let i = 0;
+  const cursor = '<span class="dlg-cursor"></span>';
+  typeTimer = setInterval(() => {
+    if (i >= text.length) {
+      clearInterval(typeTimer);
+      typeDone = true;
+      el.innerHTML = text.replace(/\n/g, '<br>');
+      if (onDone) onDone();
+      return;
+    }
+    el.innerHTML = text.slice(0, i + 1).replace(/\n/g, '<br>') + cursor;
+    i++;
+  }, 22);
+}
+
+// ── STORY SCREEN ─────────────────────────────────────
+function showStory(idx) {
+  storyIdx = idx; slideIdx = 0;
+  const sd = STORY[idx];
+  document.getElementById('bgAura').style.background = sd.aura || 'none';
+  document.getElementById('storyScreen').classList.add('active');
+  renderSlide(sd, 0);
+}
+
+function renderSlide(sd, si) {
+  const slide = sd.slides[si];
+  document.getElementById('storyIcon').textContent = sd.locIcon;
+  document.getElementById('storyLocName').textContent = sd.locName;
+  document.getElementById('storyLocSub').textContent = sd.locSub;
+
+  const pImg = document.getElementById('dlgPortrait');
+  pImg.src = slide.portrait;
+  pImg.style.filter = slide.portrait === PLAYER_SPR ? 'brightness(0)' : 'drop-shadow(0 4px 10px rgba(0,0,0,.9))';
+
+  const rawName = slide.charName;
+  document.getElementById('dlgCharName').textContent = rawName === 'ASH' ? playerName.toUpperCase() : N(rawName);
+  document.getElementById('dlgContinue').style.opacity = '0';
+
+  const sc = document.getElementById('sceneSprites');
+  if (slide.spr && slide.spr.length) {
+    sc.style.display = 'flex';
+    sc.innerHTML = slide.spr.map((id, i) =>
+      `<img class="pxl" src="${GIF(id)}" alt="" style="width:${i===0?64:52}px;height:${i===0?64:52}px;animation:sBounce .9s ${i*.2}s ease-in-out infinite;"/>`
+    ).join('');
+  } else {
+    sc.style.display = 'none';
+    sc.innerHTML = '';
+  }
+
+  typeWrite(N(slide.lines), document.getElementById('dlgText'), () => {
+    document.getElementById('dlgContinue').style.opacity = '1';
+  });
+}
+
+function advanceStory() {
+  if (!typeDone) {
+    clearInterval(typeTimer);
+    typeDone = true;
+    const slide = STORY[storyIdx].slides[slideIdx];
+    document.getElementById('dlgText').innerHTML = N(slide.lines).replace(/\n/g, '<br>');
+    document.getElementById('dlgContinue').style.opacity = '1';
+    return;
+  }
+  const sd = STORY[storyIdx];
+  slideIdx++;
+  if (slideIdx < sd.slides.length) {
+    renderSlide(sd, slideIdx);
+  } else {
+    doWipe(() => {
+      document.getElementById('storyScreen').classList.remove('active');
+      document.getElementById('gameScreen').classList.add('active');
+      renderQ();
+    });
+  }
+}
+
+// ── TRANSITIONS ───────────────────────────────────────
+function doWipe(cb) {
+  const w = document.getElementById('wipe');
+  w.classList.add('in');
+  setTimeout(() => { cb(); setTimeout(() => w.classList.remove('in'), 300); }, 400);
+}
+
+// ── PASCAL GRID ───────────────────────────────────────
+function genPascalHTML() {
+  const ROWS = [[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1],[1,5,10,10,5,1],
+                [1,6,15,20,15,6,1],[1,7,21,35,35,21,7,1],
+                [1,8,28,56,70,56,28,8,1],[1,9,36,84,126,126,84,36,9,1]];
+  let h = '<div class="pascal-wrap">';
+  h += '<div class="pascal-title">▶ BUILD PASCAL\'S TRIANGLE — ROWS 0 TO 9</div>';
+  ROWS.forEach((row, r) => {
+    h += '<div class="p-row">';
+    if (r === 0) {
+      h += '<div class="p-fixed">1</div>';
+    } else {
+      row.forEach((val, c) => {
+        const edge = c === 0 || c === row.length - 1;
+        h += edge
+          ? '<div class="p-fixed">1</div>'
+          : `<input class="p-inp" type="number" data-val="${val}" placeholder="?" autocomplete="off" oninput="checkPCell(this)" onkeydown="if(event.key==='Enter'){event.preventDefault();}"/>`;
+      });
+    }
+    h += '</div>';
+  });
+  h += '<div class="pascal-hint">🔵 EACH CELL = SUM OF THE TWO CELLS ABOVE &nbsp;|&nbsp; EDGES ARE ALWAYS 1</div>';
+  h += '<div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+  h += '<span style="font-family:\'Press Start 2P\',monospace;font-size:8px;color:#ffde00;">C(9,4) =</span>';
+  h += '<input class="ans-input" id="pascal_final" type="number" placeholder="?" autocomplete="off" style="width:110px;" onkeydown="if(event.key===\'Enter\'){event.preventDefault();checkPascalAns();}"/>';
+  h += '</div>';
+  h += '<button class="pascal-confirm" id="pascalBtn" onclick="checkPascalAns()">CONFIRM TRIANGLE ▶</button>';
+  return h + '</div>';
+}
+
+// ── RENDER QUESTION ───────────────────────────────────
+function renderQ() {
+  answered = false;
+  const q = QS[cur];
+  document.getElementById('qNum').textContent = cur + 1;
+  document.getElementById('hudLocName').textContent = q.loc;
+  document.getElementById('progBar').style.width = ((cur / 9) * 100) + '%';
+  document.getElementById('bgAura').style.background = AURAS[cur] || 'none';
+
+  const bullets = q.bullets.length
+    ? `<ul class="q-list">${q.bullets.map(b => `<li>${N(b)}</li>`).join('')}</ul>` : '';
+  const inputs = q.labels
+    ? `<div class="multi-inputs">${q.labels.map((l, i) => `<div class="mi-row"><span class="mi-label">${l}</span><input class="ans-input" id="ans_${i}" type="number" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')checkAns()"/></div>`).join('')}</div>`
+    : `<input class="ans-input" id="ans_0" type="number" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')checkAns()"/>`;
+  const isLast  = cur === QS.length - 1;
+  const pascal  = q.pascalMode ? genPascalHTML() : '';
+  const ansRow  = q.pascalMode ? '' : `<div class="ans-row">${inputs}<button class="sub-btn" id="subBtn" onclick="checkAns()">CONFIRM ▶</button></div>`;
+
+  document.getElementById('qContainer').innerHTML = `
+    <div class="loc-badge">📍 ${q.loc}</div>
+    <div class="q-story-strip">💬 ${N(q.story)}</div>
+    <div class="q-card" id="qCard">
+      <div class="card-inner">
+        <div class="card-text">
+          <div class="q-num">QUESTION ${cur + 1} OF 9</div>
+          <div class="q-type">⚔ ${q.type}</div>
+          <div class="q-text">${N(q.q)}</div>
+          ${bullets}
+          ${q.diagramHTML || ''}
+          ${pascal}
+          <div class="q-text" style="color:var(--yellow);font-size:19px;">${N(q.ask)}</div>
+          ${ansRow}
+        </div>
+        <div class="card-spr-col">${q.cardSprite}</div>
+      </div>
+    </div>
+    <div class="res-panel" id="resPanel"></div>
+    <button class="next-btn" id="nextBtn" onclick="${isLast ? 'showWin()' : 'goNextQ()'}">
+      ${isLast ? '🏆 FINISH JOURNEY' : 'NEXT LOCATION ▶'}
+    </button>`;
+
+  setTimeout(() => { const f = document.getElementById('ans_0'); if (f) f.focus(); }, 120);
+}
+
+// ── PASCAL VALIDATION ─────────────────────────────────
+function checkPCell(el) {
+  const v = el.value.trim();
+  el.classList.remove('ok', 'err');
+  if (!v) return;
+  el.classList.add(parseInt(v) === parseInt(el.dataset.val) ? 'ok' : 'err');
+  const allCells = [...document.querySelectorAll('.p-inp')];
+  const finalEl  = document.getElementById('pascal_final');
+  if (allCells.every(i => i.classList.contains('ok')) && finalEl && parseInt(finalEl.value) === 126) {
+    setTimeout(checkPascalAns, 300);
+  }
+}
+
+function checkPascalAns() {
+  if (answered) return;
+  const allCells = [...document.querySelectorAll('.p-inp')];
+  const finalEl  = document.getElementById('pascal_final');
+  const anyEmpty = allCells.some(i => !i.value.trim());
+  const anyWrong = allCells.some(i => !i.classList.contains('ok'));
+  const finalOk  = finalEl && parseInt(finalEl.value) === 126;
+
+  if (anyEmpty) { const f = allCells.find(i => !i.value.trim()); if (f) f.focus(); return; }
+  if (!finalEl || !finalEl.value.trim()) { if (finalEl) finalEl.focus(); return; }
+
+  if (anyWrong || !finalOk) {
+    allCells.forEach(i => { if (!i.classList.contains('ok')) { i.classList.remove('err'); void i.offsetWidth; i.classList.add('err'); } });
+    if (finalEl) {
+      finalEl.style.borderColor = finalOk ? '#4caf50' : '#e3350d';
+      finalEl.style.background  = finalOk ? 'rgba(76,175,80,.18)' : 'rgba(227,53,13,.18)';
+    }
+    shakeCard();
+    return;
+  }
+  if (finalEl) { finalEl.style.borderColor = '#4caf50'; finalEl.style.background = 'rgba(76,175,80,.18)'; }
+  triggerResult(true, [126]);
+}
+
+// ── ANSWER CHECKING ───────────────────────────────────
+function checkAns() {
+  if (answered) return;
+  const q = QS[cur];
+  if (q.pascalMode) { checkPascalAns(); return; }
+  const userAns = [];
+  for (let i = 0; i < q.answers.length; i++) {
+    const el = document.getElementById(`ans_${i}`);
+    if (!el || el.value === '') return;
+    userAns.push(parseInt(el.value));
+  }
+  triggerResult(userAns.every((v, i) => v === q.answers[i]), userAns);
+}
+
+function triggerResult(allOk, userAns) {
+  if (answered) return;
+  answered = true;
+  const q       = QS[cur];
+  const subBtn  = document.getElementById('subBtn');
+  const pBtn    = document.getElementById('pascalBtn');
+  if (subBtn) subBtn.disabled = true;
+  if (pBtn)   pBtn.disabled   = true;
+  document.querySelectorAll('.ans-input').forEach(e => e.disabled = true);
+  document.querySelectorAll('.p-inp').forEach(e => e.disabled = true);
+
+  const card    = document.getElementById('qCard');
+  const panel   = document.getElementById('resPanel');
+  const nextBtn = document.getElementById('nextBtn');
+  const sprites = card.querySelectorAll('img.pxl');
+
+  if (allOk) {
+    score++;
+    document.getElementById('scoreVal').textContent = score;
+    card.classList.add('c-flash');
+    sprites.forEach(s => { s.classList.remove('spr-bounce','spr-float'); void s.offsetWidth; s.classList.add('spr-spin-in'); });
+    spawnParticles();
+    panel.className = 'res-panel good show';
+    panel.innerHTML = `
+      <div class="res-inner">
+        <div class="res-spr"><img src="${q.resSpr}" alt=""/><div class="spr-label" style="color:var(--green)">NICE!</div></div>
+        <div class="res-content">
+          <div class="res-hdr ok">✅ CORRECT! +1 POINT</div>
+          <div style="font-size:18px;color:rgba(255,255,255,.7);margin-bottom:12px;">Want to see the solution?</div>
+          <div class="choice-btns">
+            <button class="cbtn yes" onclick="revealSol()">📖 YES, SHOW ME</button>
+            <button class="cbtn no"  onclick="skipSol()">⏭ SKIP</button>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    shakeCard();
+    sprites.forEach(s => { s.classList.remove('spr-bounce','spr-float'); void s.offsetWidth; s.classList.add('spr-shake'); });
+    panel.className = 'res-panel wrong show';
+    panel.innerHTML = buildSol(q, true, q.pascalMode ? ['(see solution)'] : userAns);
+    nextBtn.classList.add('show');
+  }
+}
+
+function shakeCard() {
+  const card = document.getElementById('qCard');
+  card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+  document.getElementById('wOverlay').classList.add('flash');
+  setTimeout(() => document.getElementById('wOverlay').classList.remove('flash'), 700);
+}
+
+function buildSol(q, isWrong, userAns) {
+  const hdr = isWrong
+    ? `<div class="res-hdr bad">❌ NOT QUITE...</div><div style="font-size:17px;color:rgba(255,120,120,.9);margin-bottom:12px;">Your answer: ${userAns.join(', ')} — Here's the solution:</div>`
+    : `<div class="res-hdr ok" style="margin-bottom:12px;">📖 SOLUTION</div>`;
+  const steps = q.solution.steps.map(s => `<div class="sol-step">${N(s)}</div>`).join('');
+  return `<div class="res-inner">
+    <div class="res-spr">
+      <img src="${q.resSpr}" alt="" style="${isWrong ? 'filter:grayscale(.55)' : ''}"/>
+      <div class="spr-label" style="color:${isWrong ? 'var(--red)' : 'var(--green)'};">${isWrong ? 'Oops!' : 'Great!'}</div>
+    </div>
+    <div class="res-content">${hdr}<div class="sol-block">${steps}<div class="sol-ans">${N(q.solution.final)}</div></div></div>
+  </div>`;
+}
+
+function revealSol() {
+  document.getElementById('resPanel').innerHTML = buildSol(QS[cur], false, []);
+  document.getElementById('nextBtn').classList.add('show');
+}
+function skipSol() { document.getElementById('nextBtn').classList.add('show'); }
+
+function goNextQ() {
+  cur++;
+  // STORY[0]=intro, STORY[1..9]=before Q1..Q9, so STORY[cur+1] is the story before QS[cur]
+  const storyFor = cur + 1;
+  doWipe(() => {
+    document.getElementById('gameScreen').classList.remove('active');
+    if (storyFor < STORY.length) {
+      showStory(storyFor);
+    } else {
+      document.getElementById('gameScreen').classList.add('active');
+      renderQ();
+    }
+  });
+}
+
+// ── WIN SCREEN ────────────────────────────────────────
+function showWin() {
+  document.getElementById('progBar').style.width = '100%';
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('winTitle').textContent =
+    '🏆 ' + playerName.toUpperCase() + ' — CHAMPION! 🏆';
+  document.getElementById('winMsg').textContent =
+    score === 9 ? '🌟 PERFECT SCORE — POKÉMON MASTER!' :
+    score >= 7  ? '⭐ EXCELLENT WORK, TRAINER!' :
+    score >= 5  ? '👍 GOOD JOB! KEEP GOING!' : '💪 KEEP TRAINING!';
+  const stories = [
+    "You did it, Ash! Against all odds, every puzzle solved — you stand as the undisputed Pokémon League Champion! Professor Oak watches from the crowd, tears in his eyes.",
+    "Nine questions. Nine victories. Ash holds the trophy above their head as Pikachu leaps onto their shoulder. Even Gary has to admit — this trainer has what it takes.",
+    "Most of Kanto's challenges are behind you now. Ash may not have gotten every answer right, but the journey taught them more than any classroom ever could.",
+    "The road was tough, Ash. Some answers slipped away. But every trainer falls before they learn to fly. Get back to Professor Oak and study up — Kanto still needs you!"
+  ];
+  document.getElementById('winStory').textContent =
+    N(stories[score === 9 ? 0 : score >= 7 ? 1 : score >= 5 ? 2 : 3]);
+  doWipe(() => {
+    document.getElementById('gameScreen').classList.remove('active');
+    document.getElementById('winScreen').classList.add('active');
+    spawnParticles(); setTimeout(spawnParticles, 600); setTimeout(spawnParticles, 1200);
+  });
+}
+
+// ── PARTICLES ─────────────────────────────────────────
+function spawnParticles() {
+  const em = ['⭐','✨','💫','🌟','🎉','🏅','🔥','⚡','❄️'];
+  for (let i = 0; i < 18; i++) {
+    const p = document.createElement('div');
+    p.className = 'ptcl';
+    p.textContent = em[Math.floor(Math.random() * em.length)];
+    p.style.left = (10 + Math.random() * 80) + 'vw';
+    p.style.top  = (20 + Math.random() * 60) + 'vh';
+    p.style.setProperty('--d2', (0.7 + Math.random() * 1) + 's');
+    p.style.setProperty('--dx', (-100 + Math.random() * 200) + 'px');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+// ── KEYBOARD SHORTCUTS ────────────────────────────────
+document.addEventListener('keydown', e => {
+  // Space/Enter to advance story
+  if ((e.code === 'Space' || e.code === 'Enter') && document.getElementById('storyScreen').classList.contains('active')) {
+    e.preventDefault(); advanceStory();
+  }
+  // Secret admin trigger: type PROFOAK
+  _kseq += e.key.toUpperCase();
+  if (_kseq.length > 7) _kseq = _kseq.slice(-7);
+  if (_kseq === 'PROFOAK') { _kseq = ''; openAdminAuth(); }
+});
+let _kseq = '';
+
+// ── STARS ─────────────────────────────────────────────
+const se = document.getElementById('stars');
+for (let i = 0; i < 140; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const sz = Math.random() * 2.5 + 0.4;
+  s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${1.5+Math.random()*3.5}s;`;
+  se.appendChild(s);
+}
+
+// ── Pokéball click trigger (×5) ────────────────────────
+let _pbClicks = 0, _pbTimer = null;
+document.querySelector('.pball').addEventListener('click', () => {
+  _pbClicks++;
+  if (_pbTimer) clearTimeout(_pbTimer);
+  if (_pbClicks >= 5) { _pbClicks = 0; openAdminAuth(); }
+  else _pbTimer = setTimeout(() => _pbClicks = 0, 800);
+});
+
+// ══════════════════════════════════════════════════════
+//  ADMIN SYSTEM
+// ══════════════════════════════════════════════════════
+const ADMIN_PW_KEY = 'kq_admin_pw';
+const getAdminPw   = () => localStorage.getItem(ADMIN_PW_KEY) || 'pikachu2025';
+
+function openAdminAuth() {
+  document.getElementById('adminAuth').classList.add('show');
+  document.getElementById('authInp').value = '';
+  document.getElementById('authErr').textContent = '';
+  setTimeout(() => document.getElementById('authInp').focus(), 100);
+}
+function closeAdminAuth() { document.getElementById('adminAuth').classList.remove('show'); }
+
+function attemptAuth() {
+  const v = document.getElementById('authInp').value;
+  if (v === getAdminPw()) {
+    closeAdminAuth();
+    document.getElementById('adminLock').classList.add('visible');
+    openAdmin();
+  } else {
+    const err = document.getElementById('authErr');
+    err.textContent = 'WRONG PASSWORD — TRY AGAIN';
+    document.getElementById('authInp').value = '';
+    setTimeout(() => err.textContent = '', 2200);
+  }
+}
+
+function openAdmin() {
+  admBuildSidebar();
+  admShowTab('overview', document.querySelector('.adm-tab.act'));
+  document.getElementById('admStats').textContent =
+    `QUESTIONS: ${QS.length}   |   STORY SCENES: ${STORY.length}   |   CURRENT SCORE: ${score}/${cur}`;
+  document.getElementById('adminPanel').classList.add('show');
+}
+function closeAdmin() { document.getElementById('adminPanel').classList.remove('show'); }
+
+function admBuildSidebar() {
+  const qt = document.getElementById('admQTabs');
+  const st = document.getElementById('admSTabs');
+  qt.innerHTML = ''; st.innerHTML = '';
+  QS.forEach((q, i) => {
+    const b = document.createElement('button');
+    b.className = 'adm-tab';
+    b.textContent = `Q${i+1} ${q.loc.replace(/^[^\s]+\s/, '').slice(0, 13)}`;
+    b.onclick = () => { admShowTab('q' + i, b); admBuildQ(i); };
+    qt.appendChild(b);
+    if (!document.getElementById('sec-q' + i)) {
+      const s = document.createElement('div'); s.className = 'adm-sec'; s.id = 'sec-q' + i;
+      document.getElementById('admContent').appendChild(s);
+    }
+  });
+  STORY.forEach((sd, i) => {
+    const b = document.createElement('button');
+    b.className = 'adm-tab';
+    b.textContent = `S${i+1} ${sd.locName.slice(0, 13)}`;
+    b.onclick = () => { admShowTab('s' + i, b); admBuildS(i); };
+    st.appendChild(b);
+    if (!document.getElementById('sec-s' + i)) {
+      const s = document.createElement('div'); s.className = 'adm-sec'; s.id = 'sec-s' + i;
+      document.getElementById('admContent').appendChild(s);
+    }
+  });
+}
+
+function admShowTab(id, btn) {
+  document.querySelectorAll('.adm-sec').forEach(s => s.classList.remove('act'));
+  document.querySelectorAll('.adm-tab').forEach(b => b.classList.remove('act'));
+  const sec = document.getElementById('sec-' + id);
+  if (sec) sec.classList.add('act');
+  if (btn) btn.classList.add('act');
+}
+
+function admBuildQ(i) {
+  const q = QS[i];
+  const bHTML = q.bullets.map((b, bi) =>
+    `<div class="adm-bullet-row"><input type="text" value="${escH(b)}" id="admq${i}_b${bi}"/><button class="adm-bullet-del" onclick="admDelBullet(${i},${bi})">✕</button></div>`
+  ).join('');
+  document.getElementById('sec-q' + i).innerHTML =
+    `<h2>Q${i+1} — ${escH(q.loc)}</h2>
+    <div class="adm-badge">${escH(q.type)}</div>
+    <div class="adm-row">
+      <div class="adm-field"><label>LOCATION</label><input id="admq${i}_loc" value="${escH(q.loc)}"/></div>
+      <div class="adm-field"><label>TYPE BADGE</label><input id="admq${i}_type" value="${escH(q.type)}"/></div>
+    </div>
+    <div class="adm-field"><label>STORY STRIP</label><input id="admq${i}_story" value="${escH(q.story||'')}"/></div>
+    <div class="adm-field"><label>QUESTION TEXT</label><textarea id="admq${i}_q">${escH(q.q)}</textarea></div>
+    <div class="adm-field"><label>BULLET POINTS</label>
+      <div class="adm-bullets-wrap" id="admq${i}_bullets">${bHTML}</div>
+      <button class="adm-add-bullet" onclick="admAddBullet(${i})">+ ADD BULLET</button>
+    </div>
+    <div class="adm-field"><label>ASK / PROMPT (yellow text)</label><input id="admq${i}_ask" value="${escH(q.ask)}"/></div>
+    <div class="adm-row">
+      <div class="adm-field"><label>CORRECT ANSWERS (comma-separated)</label><input id="admq${i}_answers" value="${q.answers.join(', ')}"/></div>
+      <div class="adm-field"><label>ANSWER LABELS (one per line)</label><textarea id="admq${i}_labels" style="min-height:48px;">${q.labels ? q.labels.join('\n') : ''}</textarea></div>
+    </div>
+    <hr class="adm-divider"/>
+    <div class="adm-field"><label>SOLUTION STEPS (one per line)</label><textarea id="admq${i}_steps" style="min-height:90px;">${escH(q.solution.steps.join('\n'))}</textarea></div>
+    <div class="adm-field"><label>FINAL ANSWER LINE</label><input id="admq${i}_final" value="${escH(q.solution.final)}"/></div>`;
+}
+
+function admDelBullet(qi, bi) { QS[qi].bullets.splice(bi, 1); admBuildQ(qi); }
+function admAddBullet(qi)      { QS[qi].bullets.push('New bullet point'); admBuildQ(qi); }
+
+function admBuildS(i) {
+  const sd = STORY[i];
+  const slidesHTML = sd.slides.map((sl, si) =>
+    `<div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:14px;margin-bottom:12px;">
+      <div class="adm-field"><label>SLIDE ${si+1} — CHARACTER NAME</label><input id="adms${i}_${si}_name" value="${escH(sl.charName)}"/></div>
+      <div class="adm-field"><label>DIALOGUE (\\n = new line)</label><textarea id="adms${i}_${si}_lines">${escH(sl.lines)}</textarea></div>
+      <div class="adm-field"><label>SCENE SPRITES (Pokédex IDs, comma-separated)</label><input id="adms${i}_${si}_spr" value="${sl.spr ? sl.spr.join(', ') : ''}"/></div>
+    </div>`
+  ).join('');
+  document.getElementById('sec-s' + i).innerHTML =
+    `<h2>SCENE ${i+1} — ${escH(sd.locName)}</h2>
+    <div class="adm-row">
+      <div class="adm-field"><label>LOCATION NAME</label><input id="adms${i}_loc" value="${escH(sd.locName)}"/></div>
+      <div class="adm-field"><label>SUBTITLE</label><input id="adms${i}_sub" value="${escH(sd.locSub)}"/></div>
+    </div>
+    <div class="adm-field"><label>ICON (emoji)</label><input id="adms${i}_icon" value="${escH(sd.locIcon)}"/></div>
+    <hr class="adm-divider"/>
+    ${slidesHTML}`;
+}
+
+function admSave() {
+  const get = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  QS.forEach((q, i) => {
+    const loc   = get(`admq${i}_loc`);   if (loc)   q.loc   = loc;
+    const type  = get(`admq${i}_type`);  if (type)  q.type  = type;
+    q.story = get(`admq${i}_story`);
+    const qv    = get(`admq${i}_q`);     if (qv)    q.q     = qv;
+    const ask   = get(`admq${i}_ask`);   if (ask)   q.ask   = ask;
+    const nb = []; q.bullets.forEach((_, bi) => { const el = document.getElementById(`admq${i}_b${bi}`); if (el && el.value.trim()) nb.push(el.value.trim()); }); q.bullets = nb;
+    const ar = get(`admq${i}_answers`); if (ar) q.answers = ar.split(',').map(a => parseInt(a.trim())).filter(n => !isNaN(n));
+    const lr = get(`admq${i}_labels`);  q.labels = lr ? lr.split('\n').map(l => l.trim()).filter(Boolean) : null; if (q.labels && !q.labels.length) q.labels = null;
+    const sr = get(`admq${i}_steps`);   if (sr) q.solution.steps = sr.split('\n').map(s => s.trim()).filter(Boolean);
+    const fi = get(`admq${i}_final`);   if (fi) q.solution.final = fi;
+  });
+  STORY.forEach((sd, i) => {
+    const loc = get(`adms${i}_loc`);  if (loc)  sd.locName = loc;
+    const sub = get(`adms${i}_sub`);  if (sub)  sd.locSub  = sub;
+    const ico = get(`adms${i}_icon`); if (ico)  sd.locIcon = ico;
+    sd.slides.forEach((sl, si) => {
+      const n  = get(`adms${i}_${si}_name`); if (n) sl.charName = n;
+      const l  = get(`adms${i}_${si}_lines`); if (l) sl.lines   = l;
+      const sp = get(`adms${i}_${si}_spr`);
+      sl.spr = sp ? sp.split(',').map(x => parseInt(x.trim())).filter(n => !isNaN(n)) : null;
+      if (sl.spr && !sl.spr.length) sl.spr = null;
+    });
+  });
+  admToast('CHANGES SAVED — RELOAD GAME TO APPLY');
+}
+
+function changePassword() {
+  const cur  = document.getElementById('pwCurrent').value;
+  const nw   = document.getElementById('pwNew').value;
+  const conf = document.getElementById('pwConfirm').value;
+  const err  = document.getElementById('pwErr');
+  if (cur !== getAdminPw()) { err.textContent = 'CURRENT PASSWORD IS WRONG'; return; }
+  if (nw.length < 4)         { err.textContent = 'PASSWORD MUST BE 4+ CHARS'; return; }
+  if (nw !== conf)            { err.textContent = 'PASSWORDS DO NOT MATCH'; return; }
+  localStorage.setItem(ADMIN_PW_KEY, nw);
+  ['pwCurrent','pwNew','pwConfirm'].forEach(id => document.getElementById(id).value = '');
+  err.textContent = '';
+  admToast('PASSWORD UPDATED!');
+}
+
+function admToast(msg) {
+  const t = document.getElementById('admToast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function escH(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
 </body>
 </html>
