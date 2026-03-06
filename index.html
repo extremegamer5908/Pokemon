@@ -519,25 +519,55 @@ function buildTreeSVG() {
 function buildVennSVG() {
   const PS = "font-family=\"'Press Start 2P',monospace\"";
   const VT = "font-family=\"'VT323',monospace\"";
-  let s = `<svg class="diag-svg" viewBox="0 0 500 270" width="100%">`;
-  s += `<text x="250" y="20" text-anchor="middle" ${PS} font-size="8" fill="#ffde00">VENN DIAGRAM — TRAINER'S POKÉMON (total: 30)</text>`;
-  s += `<rect x="12" y="28" width="476" height="228" rx="6" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="1.5" stroke-dasharray="7,5"/>`;
-  s += `<circle cx="185" cy="155" r="102" fill="rgba(227,53,13,.13)" stroke="#e3350d" stroke-width="2.5"/>`;
-  s += `<circle cx="315" cy="155" r="102" fill="rgba(148,0,211,.13)" stroke="#9b20e0" stroke-width="2.5"/>`;
-  s += `<text x="143" y="52" text-anchor="middle" ${PS} font-size="7" fill="#ff5533">🔥 FIRE</text>`;
-  s += `<text x="143" y="64" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,100,60,.75)">(17 total)</text>`;
-  s += `<text x="357" y="52" text-anchor="middle" ${PS} font-size="7" fill="#c060ff">🔮 PSYCHIC</text>`;
-  s += `<text x="357" y="64" text-anchor="middle" ${PS} font-size="6" fill="rgba(190,100,255,.75)">(14 total)</text>`;
-  s += `<text x="120" y="154" text-anchor="middle" ${PS} font-size="7" fill="rgba(255,100,60,.7)">FIRE</text>`;
-  s += `<text x="120" y="168" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,100,60,.5)">ONLY</text>`;
-  s += `<text x="250" y="150" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,220,0,.8)">BOTH</text>`;
-  s += `<text x="250" y="162" text-anchor="middle" ${PS} font-size="6" fill="rgba(255,220,0,.55)">(6 known)</text>`;
-  s += `<text x="380" y="154" text-anchor="middle" ${PS} font-size="7" fill="rgba(190,100,255,.7)">PSYCHIC</text>`;
-  s += `<text x="380" y="168" text-anchor="middle" ${PS} font-size="6" fill="rgba(190,100,255,.5)">ONLY</text>`;
-  s += `<circle cx="464" cy="210" r="22" fill="rgba(255,255,255,.04)" stroke="rgba(255,255,255,.2)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-  s += `<text x="464" y="206" text-anchor="middle" ${VT} font-size="14" fill="rgba(255,255,255,.35)">?</text>`;
-  s += `<text x="464" y="224" text-anchor="middle" ${PS} font-size="5"  fill="rgba(255,255,255,.3)">Neither</text>`;
-  s += `<text x="40"  y="248" ${PS} font-size="6" fill="rgba(255,255,255,.3)">Total = 30</text>`;
+  // Layout: viewBox 560 x 320
+  // Outer rectangle: full set (30 Pokémon)
+  // Fire circle:    cx=190, cy=175, r=108
+  // Psychic circle: cx=330, cy=175, r=108
+  // Overlap centre: x=260, overlap region x≈218–262
+  // FIRE ONLY region centre: ~x=130
+  // PSYCHIC ONLY region centre: ~x=390
+  // NEITHER region: bottom-right corner of rectangle, outside both circles
+  let s = `<svg class="diag-svg" viewBox="0 0 560 320" width="100%">`;
+
+  // Title
+  s += `<text x="280" y="22" text-anchor="middle" ${PS} font-size="8" fill="#ffde00">VENN DIAGRAM — TRAINER'S POKÉMON</text>`;
+
+  // Outer rectangle = universal set
+  s += `<rect x="14" y="32" width="532" height="272" rx="8" fill="rgba(255,255,255,.03)" stroke="rgba(255,255,255,.22)" stroke-width="2" stroke-dasharray="8,5"/>`;
+  s += `<text x="30" y="52" ${PS} font-size="7" fill="rgba(255,255,255,.4)">TOTAL = 30</text>`;
+
+  // Fire circle
+  s += `<circle cx="200" cy="178" r="108" fill="rgba(227,53,13,.15)" stroke="#e3350d" stroke-width="2.5"/>`;
+  // Psychic circle
+  s += `<circle cx="340" cy="178" r="108" fill="rgba(148,0,211,.15)" stroke="#9b20e0" stroke-width="2.5"/>`;
+
+  // Circle header labels (above circles, inside rect)
+  s += `<text x="155" y="58" text-anchor="middle" ${PS} font-size="8" fill="#ff6644">🔥 FIRE</text>`;
+  s += `<text x="155" y="72" text-anchor="middle" ${PS} font-size="7" fill="rgba(255,120,80,.7)">(17 total)</text>`;
+  s += `<text x="385" y="58" text-anchor="middle" ${PS} font-size="8" fill="#cc66ff">🔮 PSYCHIC</text>`;
+  s += `<text x="385" y="72" text-anchor="middle" ${PS} font-size="7" fill="rgba(190,120,255,.7)">(14 total)</text>`;
+
+  // Region: FIRE ONLY — students must derive this (17 - 6 = 11)
+  s += `<text x="138" y="172" text-anchor="middle" ${PS} font-size="8" fill="#ff6644">FIRE</text>`;
+  s += `<text x="138" y="187" text-anchor="middle" ${PS} font-size="8" fill="#ff6644">ONLY</text>`;
+  s += `<text x="138" y="208" text-anchor="middle" ${VT} font-size="28" fill="rgba(255,120,80,.45)">?</text>`;
+
+  // Region: BOTH — given in the question
+  s += `<text x="270" y="165" text-anchor="middle" ${PS} font-size="7" fill="#ffde00">BOTH</text>`;
+  s += `<text x="270" y="195" text-anchor="middle" ${VT} font-size="28" fill="#ffde00">6</text>`;
+
+  // Region: PSYCHIC ONLY — students must derive this (14 - 6 = 8)
+  s += `<text x="402" y="172" text-anchor="middle" ${PS} font-size="8" fill="#cc66ff">PSYCHIC</text>`;
+  s += `<text x="402" y="187" text-anchor="middle" ${PS} font-size="8" fill="#cc66ff">ONLY</text>`;
+  s += `<text x="402" y="208" text-anchor="middle" ${VT} font-size="28" fill="rgba(190,120,255,.45)">?</text>`;
+
+  // Region: NEITHER — what students solve for in part (b)
+  s += `<text x="490" y="260" text-anchor="middle" ${PS} font-size="7" fill="rgba(255,255,255,.4)">NEITHER</text>`;
+  s += `<text x="490" y="280" text-anchor="middle" ${VT} font-size="28" fill="rgba(255,255,255,.3)">?</text>`;
+
+  // Formula hint at bottom
+  s += `<text x="280" y="312" text-anchor="middle" ${PS} font-size="6" fill="rgba(104,144,240,.55)">HINT: USE INCLUSION-EXCLUSION — |A ∪ B| = |A| + |B| − |A ∩ B|</text>`;
+
   return s + '</svg>';
 }
 
