@@ -400,7 +400,17 @@ img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow
 }
 .name-go-btn:hover{transform:translate(-2px,-2px);}
 .name-go-btn:active{transform:translate(2px,2px);}
-.name-oak-img{width:72px;height:72px;image-rendering:pixelated;animation:sFloat 3s ease-in-out infinite;}
+.name-oak-img{width:72px;height:72px;image-rendering:auto;animation:sFloat 3s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(0,0,0,.9));}
+
+
+/* ── TRAINER PORTRAITS ── */
+.dlg-portrait img.portrait-oak{width:72px;height:72px;image-rendering:auto;filter:drop-shadow(0 4px 10px rgba(0,0,0,.9));}
+.dlg-portrait img.portrait-player{
+  width:72px;height:72px;image-rendering:auto;
+  filter:brightness(0) drop-shadow(0 0 12px rgba(104,144,240,.7)) drop-shadow(0 0 24px rgba(104,144,240,.4));
+  animation:sFloat 2.8s ease-in-out infinite;
+}
+.dlg-portrait img.portrait-npc{width:72px;height:72px;image-rendering:pixelated;filter:drop-shadow(0 4px 8px rgba(0,0,0,.8));}
 
 @media(max-width:600px){
   .q-card{padding:14px;}
@@ -437,7 +447,7 @@ img.pxl{image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow
 <!-- ══════════ NAME ENTRY SCREEN ══════════ -->
 <div id="nameScreen">
   <div class="name-card">
-    <img class="name-oak-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/103.gif" alt="Oak"/>
+    <img class="name-oak-img" src="https://play.pokemonshowdown.com/sprites/trainers/oak.png" alt="Oak" style="width:72px;height:72px;"/>
     <h2>WHAT IS YOUR<br>NAME, TRAINER?</h2>
     <p>Professor Oak needs to know who you are before your journey begins!</p>
     <input class="name-inp" id="nameInp" type="text" maxlength="12" placeholder="YOUR NAME"
@@ -520,8 +530,9 @@ function N(s){
 }
 
 const GIF=id=>`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/${id}.gif`;
-const OAK='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/103.gif';
-const ASH_PIKA=GIF(25);
+const OAK='https://play.pokemonshowdown.com/sprites/trainers/oak.png';
+const ASH_PIKA='https://play.pokemonshowdown.com/sprites/trainers/red.png';
+const PLAYER_IS_SILHOUETTE=true;
 const GARY=GIF(132);
 
 // ── BG AURAS PER LOCATION ──────────────────────────
@@ -853,7 +864,12 @@ function renderSlide(sd,si){
   document.getElementById('storyIcon').textContent=sd.locIcon;
   document.getElementById('storyLocName').textContent=sd.locName;
   document.getElementById('storyLocSub').textContent=sd.locSub;
-  document.getElementById('dlgPortrait').src=slide.portrait;
+  var pImg=document.getElementById('dlgPortrait');
+  pImg.src=slide.portrait;
+  pImg.className='pxl-float';
+  if(slide.portrait===OAK){pImg.className='portrait-oak';}
+  else if(slide.portrait===ASH_PIKA){pImg.className='portrait-player';}
+  else{pImg.className='portrait-npc';}
   document.getElementById('dlgCharName').textContent=slide.charName==='ASH'?playerName.toUpperCase():N(slide.charName);
   document.getElementById('dlgContinue').style.opacity='0';
 
